@@ -1,5 +1,5 @@
 T := @enum CPT OBJ CLASS TOBJ\
- INT FLOAT NUMBIG STR BYTES ARR DIC\
+ INT FLOAT NUMBIG STR BYTES ARR ARRSTR DIC\
  ID CALL ARRMID DICMID
 Cptx => {
  type: T
@@ -11,6 +11,7 @@ Cptx => {
 
  owner: Cptx //for method and prop
 
+ keys: Arr_Str
  arr: Arrx
  dic: Dicx
 
@@ -23,13 +24,45 @@ Arrx := @type Arr Cptx
 Dicx := @type Dic Cptx
 Funcx ->(Arrx, Cptx)Cptx
 
+defns := nsNewx("def")
+execns := nsNewx("exec")
+mainsp := scopeNewx(defns, "main")
+idsp := scopeNewx(defns, "id")
+nssp := scopeNewx(defns, "ns")
+mainesp := scopeNewx(execns, "main")
 
-mainsp := nsNewx()
+idmainv := objNewx()
+routex(idsp, "mainsp", idmain)
 
-envmainv := objNewx()
+
 uidi := Uint(1)
 
-dicNewx ->(dic Dicx, arr Arrx, class Cptx)Cptx{
+
+
+nsNewx ->(name Str)Cptx{
+ Cptx#x = dicNewx()
+ @if(nsc){
+  x.class = nsc
+ }
+ @if(nssp){
+  x.scope = nssp
+ }
+ x.name = name
+ @return x;
+}
+scopeNewx ->(ns Cptx, name Str)Cptx{
+ #x = dicNewx()
+ @if(scopec){
+  x.class = scopec
+ }
+ @if(nssp){
+  x.scope = nssp
+ }
+ x.name = ns.name + "/" + name
+ dicSetx(ns, name, x)
+ @return x;
+}
+dicNewx ->(dic Dicx, arr Arr_Str, class Cptx)Cptx{
  #r = &Cptx{
   type: T##DIC
   
@@ -37,29 +70,25 @@ dicNewx ->(dic Dicx, arr Arrx, class Cptx)Cptx{
   id: uidx()
   
   dic: dicOrx(dic)
-  arr: arrOrx(arr)
  }
  @if(arr == _){
   @if(dic != _){
    @each k _ dic{
-    r.arr.push(strNewx(k))
+    r.keys.push(k)
    }
   }@else{
-   r.arr = &Arrx
+   r.keys = &Arr_Str
   }
  }@else{
-  r.arr = arr
+  r.keys = arr
  }
  @return r
 }
-
-nssp := 
-
-nsNewx ->(name Str)Cptx{
- Cptx#x = dicNewx()
- x.name = "Ns_" + name
- x.str = name
- @return x;
+dicSetx ->(dic Cptx, key Str, val Cptx)Cptx{
+ @if(dic.dic[name] == _){
+  dic.keys.push(name)
+ }
+ @return val
 }
 objNewx ->(class Cptx, dic Dicx)Cptx{
  #x = &Cptx{

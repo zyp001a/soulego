@@ -5,21 +5,23 @@
 #include "ast.h"		
 
 extern char yytext[];
+extern char line_dump[];
 extern int row;
 extern int funcrow;
 extern int column;
+extern int columnsp;
 int yylex (void);	
 
 void yyerror(YYSTYPE* ret, const char *s)
 {
 	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
-	print(*ret);
-  printf("\n");
+	printf("Line: %d\n", row);
+  printf("%.*s\n", column, line_dump);		
+	printf("%*c%c\n", columnsp, ' ', '^');
+  printf("%s\n", s);
 }
  
 %}
-
 %parse-param {YYSTYPE* ret}
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -43,7 +45,11 @@ primary_expression
 		$$ = initnode("id");
 		addnode($$, $1);
 	}
-	| CONSTANT
+	| CONSTANT	
+	{
+		$$ = initnode("constant");
+		addnode($$, $1);	
+	}
 	| STRING_LITERAL
 	| '(' expression ')'
 	;
@@ -417,14 +423,42 @@ statement
 
 open_statement
 	: IF '(' expression ')' statement
+	{
+		$$ = initnode("if");
+		addnode($$, $3);
+		addnode($$, $5);
+	}
   | IF '(' expression ')' closed_statement ELSE open_statement
+	{
+		$$ = initnode("if");
+		addnode($$, $3);
+		addnode($$, $5);
+		addnode($$, $7);		
+	}
 	| loop_header open_statement
+	{
+		$$ = $1;
+		addnode($$, $2);
+	}
 	;
 
 closed_statement
   : simple_statement
+	{
+		$$ = $1;
+	}
   | IF '(' expression ')' closed_statement ELSE closed_statement
-  | loop_header closed_statement
+	{
+		$$ = initnode("if");
+		addnode($$, $3);
+		addnode($$, $5);
+		addnode($$, $7);		
+	}
+	| loop_header closed_statement
+	{
+		$$ = $1;
+		addnode($$, $2);
+	}
 	;
 
 
@@ -459,11 +493,15 @@ selection_header
 	;
 
 compound_statement
-: '{' '}'
-{
-	$$ = initnode("comp");
-}
+	: '{' '}'
+	{
+		$$ = initnode("comp");
+	}
 	| '{' statement_list '}'
+	{
+		$$ = initnode("comp");
+		addnode($$, $2);
+	}
 	| '{' declaration_list '}'
 	| '{' declaration_list statement_list '}'
 	;
@@ -475,6 +513,10 @@ declaration_list
 
 statement_list
 	: statement
+	{
+		$$ = initnode("stat");
+		addnode($$, $1);
+	}
 	| statement_list statement
 	;
 
@@ -544,8 +586,7 @@ function_definition
 void main()
 {
 	Ast *ast;
-  if(yyparse(&ast)){
-		fprintf(stderr, "error!\n");
+  if(!yyparse(&ast)){
+		printpretty(ast, 1);
 	}
-	printpretty(ast, 1);
 }	

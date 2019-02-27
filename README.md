@@ -6,8 +6,20 @@ It is not a program, it is a creature.
 The grammar is a modification of ANSI C grammar.
 * https://github.com/zyp001a/ansi-c-grammar
 
+## new symbol
+@ keyword and string grammar
+
+A? a? -> C+()?R?{}?E?
+
+a => 1
+a = 1
+Dic<A>
+
+{}
+
+
 ## general modification
-* no need for main function, start from expression, global var with keywork "global"
+* no need for main function, start from compound_statement without { }, global var with keyword "@global"
 * use @'' for char; use @"" for char*; '', "", `` are all strings;
 * change or remove all "," related grammar
 * "," and "\n" are consider as ";"
@@ -17,6 +29,7 @@ The grammar is a modification of ANSI C grammar.
 * change function definition, which is also class (GO style, JS internal)
 * struct, enum, union is static class, function is dynamic class
 * sum type support (Haskell, enum + union)
+
 * template grammar ("@`*`", default PHP like, "<= >" to "~= ~")
 * command grammar (bash like, begin with $)
 * big number support (1b)

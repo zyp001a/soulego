@@ -10,3 +10,4 @@ node_modules
 *.tab.c
 *.yy.c
 *.cache
+parser

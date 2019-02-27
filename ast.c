@@ -52,23 +52,22 @@ void print(Ast *ast)
   	printf("%d", ast->len);				
 	}
 }
-char* inds = "                                          ";
 void printpretty(Ast *ast, int ind)
 {
 	int i;
 	if(ast->type == TNODE){//is ast []
 		putchar('[');
 		if(ast->len > 0){
-			printf("\n%.*s", ind, inds);
+			printf("\n%*c", ind, ' ');			
 		}
   	printf("\"%s\"", ast->str);
 		for(i=0; i<ast->len; i++){
 			putchar(',');
-			printf("\n%.*s", ind, inds);						
+			printf("\n%*c", ind, ' ');						
 			printpretty(ast->arr[i], ind+1);
 		}
 		if(ast->len > 0){
-			printf("\n%.*s", ind-1, inds);
+			printf("\n%*c", ind-1, ' ');
 		}
 		putchar(']');
 	}else if(ast->type == TSTR){//is str

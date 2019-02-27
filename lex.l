@@ -12,6 +12,7 @@ IS			(u|U|l|L)*
 
 void count();
 void comment();
+void unput_if();
 int check_type();
 %}
 
@@ -27,13 +28,16 @@ int check_type();
 "default"		{ count(); return(DEFAULT); }
 "do"			{ count(); return(DO); }
 "double"		{ count(); return(DOUBLE); }
-"else"			{ count(); return(ELSE); }
 "enum"			{ count(); return(ENUM); }
 "extern"		{ count(); return(EXTERN); }
 "float"			{ count(); return(FLOAT); }
 "for"			{ count(); return(FOR); }
 "goto"			{ count(); return(GOTO); }
-"if"			{ count(); return(IF); }
+
+"@if"			{ count(); return(IF); }
+"@else"			{ count(); return(ELSE); }
+"@elif"			{ count(); unput_if(); return(ELSE); }
+
 "int"			{ count(); return(INT); }
 "long"			{ count(); return(LONG); }
 "register"		{ count(); return(REGISTER); }
@@ -55,7 +59,7 @@ int check_type();
 
 0[xX]{H}+{IS}?		{ count(); return(CONSTANT); }
 0{D}+{IS}?		{ count(); return(CONSTANT); }
-{D}+{IS}?		{ count(); return(CONSTANT); }
+{D}+{IS}?		{ count(); yylval = initstr(yytext); return(CONSTANT); }
 L?'(\\.|[^\\'])+'	{ count(); return(CONSTANT); }
 
 {D}+{E}{FS}?		{ count(); return(CONSTANT); }
@@ -143,25 +147,41 @@ loop:
 int row = 1;//the line number (end of grammar)
 int funcrow = 0;//the line count for func decl(end - start)
 int column = 0;
-
+int columnsp = 0;
+#define LINE_DUMP_SIZE 1024
+char line_dump[LINE_DUMP_SIZE];
+int nocount_flag = 0;
 void count()
 {
 	int i;
-
+	if(nocount_flag){
+		nocount_flag = 0;
+		return;
+	}
 	for (i = 0; yytext[i] != '\0'; i++)
 		if (yytext[i] == '\n'){
       row++;
       funcrow++;
 			column = 0;
-		}else if (yytext[i] == '\t')
-			column += 8 - (column % 8);
-		else
+			columnsp = 0;			
+		}else{
+			line_dump[column] = yytext[i];
 			column++;
-
+			if(yytext[i] == '\t'){
+				columnsp+=8;
+			}else{
+				columnsp++;				
+			}
+    }
 //	ECHO;
 }
 
-
+void unput_if(){
+	nocount_flag = 1;
+	unput('f');
+	unput('i');
+	unput('@');
+}
 int check_type()
 {
 /*

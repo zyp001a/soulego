@@ -1,1 +1,1 @@
-cat test.h | ./parser
+cat test.sl | ./parser

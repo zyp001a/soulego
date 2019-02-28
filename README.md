@@ -16,6 +16,8 @@ a = 1
 Dic<A>
 
 {}
+register volatile const static
+signed 
 
 
 ## general modification

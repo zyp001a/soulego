@@ -16,12 +16,20 @@ Ast* initnode(char *str)
 	p->type = TNODE;
 	return p;
 }
-Ast* initstr(char *str)
+Ast* initstrstat(char *str)
 {
 	Ast* p = (Ast*)malloc(sizeof(Ast));
 	memset (p, 0, sizeof(Ast));
 	p->str = str;
-	p->len = strlen(str);//store strlen, so that strdup is not need in lex
+	p->len = 1;//is static
+	p->type = TSTR;
+	return p;
+}
+Ast* initstr(char *str)
+{
+	Ast* p = (Ast*)malloc(sizeof(Ast));
+	memset (p, 0, sizeof(Ast));
+	p->str = strdup(str);
 	p->type = TSTR;
 	return p;
 }
@@ -32,6 +40,16 @@ Ast* initint(int i)
 	p->len = i;
 	p->type = TINT;	
 	return p;
+}
+static Ast* nullnode;
+Ast* initnull()
+{
+	if(nullnode == NULL){
+		nullnode = (Ast*)malloc(sizeof(Ast));
+		memset (nullnode, 0, sizeof(Ast));
+		nullnode->type = TNULL;
+	}
+	return nullnode;
 }
 void print(Ast *ast)
 {
@@ -46,7 +64,7 @@ void print(Ast *ast)
 		putchar(']');
 	}else if(ast->type == TSTR){//is str
 		putchar('"');
-  	fprintf(stdout, "%.*s", ast->len, ast->str);
+  	fprintf(stdout, "%s", ast->str);
 		putchar('"');
 	}else{
   	printf("%d", ast->len);				
@@ -67,12 +85,15 @@ void printpretty(Ast *ast, int ind)
 			printpretty(ast->arr[i], ind+1);
 		}
 		if(ast->len > 0){
-			printf("\n%*c", ind-1, ' ');
+			if(ind <= 1)
+				putchar('\n');
+			else
+				printf("\n%*c", ind-1, ' ');
 		}
 		putchar(']');
 	}else if(ast->type == TSTR){//is str
 		putchar('"');
-  	fprintf(stdout, "%.*s", ast->len, ast->str);
+  	fprintf(stdout, "%s", ast->str);
 		putchar('"');
 	}else{
   	printf("%d", ast->len);				
@@ -80,6 +101,9 @@ void printpretty(Ast *ast, int ind)
 }
 void addnode(Ast *ast, Ast *subast)
 {
+	if(subast->type == TNULL){
+		return;
+	}
 	if(ast->len == 0){
 		ast->arr = (Ast**)malloc(sizeof(Ast*));
 	}else{

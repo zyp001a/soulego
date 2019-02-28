@@ -58,19 +58,27 @@ units
 : unit
 {
 	$$ = initnode("units");
-	addnode($$, $1);
+	if($1->type != TNULL){
+		addnode($$, $1);
+	}
 }
 | units unit
 {
 	$$ = $1;
-	addnode($$, $2);
+	if($2->type != TNULL){
+		addnode($$, $2);
+	}
 }
 ;
 
 unit
 : stat
 {
-	$$ = $1;
+	if($1->type != TNULL){
+		$$ = initnode("stat");
+		addnode($$, $1);
+		addint($$, row);
+	}
 }
 | decl
 {
@@ -84,14 +92,16 @@ decl
 	$$ = initnode("decl1");
 	addnode($$, $1);
 	addnode($$, $2);
-	addnode($$, $4);		
+	addnode($$, $4);
+	addint($$, row);					
 }
 | IDENTIFIER IDENTIFIER DEF2 stat ED
 {
 	$$ = initnode("decl2");
 	addnode($$, $1);
 	addnode($$, $2);
-	addnode($$, $4);	
+	addnode($$, $4);
+	addint($$, row);					
 }
 ;
 
@@ -314,7 +324,11 @@ params
 block
 : L3 R3
 {
-	$$ = initnode("block");	
+	$$ = initnode("units");	
+}
+| L3 units R3
+{
+	$$ = $2;	
 }
 ;
 

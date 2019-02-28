@@ -101,9 +101,6 @@ void printpretty(Ast *ast, int ind)
 }
 void addnode(Ast *ast, Ast *subast)
 {
-	if(subast->type == TNULL){
-		return;
-	}
 	if(ast->len == 0){
 		ast->arr = (Ast**)malloc(sizeof(Ast*));
 	}else{

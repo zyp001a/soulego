@@ -1,118 +1,114 @@
-T := @enum CPT OBJ CLASS TOBJ\
+T := @enum CLASS OBJ\
  INT FLOAT NUMBIG STR BYTES ARR ARRSTR DIC\
  ID CALL ARRMID DICMID
-Cptx => {
- type: T
-
- id: Int
-
- class: Cptx
- scope: Cptx
-
- owner: Cptx //for method and prop
-
- keys: Arr_Str
- arr: Arrx
- dic: Dicx
-
- str: Str
- int: Int
-
+Cptx := @type Cpt
+ArrCptx := @type Arr Cptx
+DicCptx := @type Dic Cptx
+Funcx ->(ArrCptx)Cptx
+Objx =>{
+ class: Classx
  val: Cpt
 }
-Arrx := @type Arr Cptx
-Dicx := @type Dic Cptx
-Funcx ->(Arrx, Cptx)Cptx
+ArrClassx := @type Arr Classx
+DicClassx := @type Dic Classx
+Classx =>{
+ type: T
+ name: Str
+ parents: ArrClassx
+ dic: DicClassx
+ id: Int
+ 
+ scope: Classx 
+ class: Classx
+ 
+ obj: Objx
+}
 
-defns := nsNewx("def")
-execns := nsNewx("exec")
-mainsp := scopeNewx(defns, "main")
-idsp := scopeNewx(defns, "id")
-nssp := scopeNewx(defns, "ns")
-mainesp := scopeNewx(execns, "main")
+ArrStrx := @type Arr Str
+Intx := @type Int
+Floatx := @type Float
+Strx := @type Str
+Bytex := @type Byte
 
-idmainv := objNewx()
-routex(idsp, "mainsp", idmain)
-
+StateDefx =>{
+ parent: StateDefx
+ arr: ArrClassx
+ dic: DicClassx
+ id: Int 
+}
+Statex =>{
+ parent: Statex
+ arr: ArrCptx
+ dic: DicCptx
+ def: StateDefx
+ id: Int
+}
+ArrStatex := @type Arr Statex
+Envx =>{
+ stack: ArrStatex
+ state: Statex
+ exec: Classx
+ def: Classx
+}
 
 uidi := Uint(1)
-
-
-
-nsNewx ->(name Str)Cptx{
- Cptx#x = dicNewx()
- @if(nsc){
-  x.class = nsc
- }
- @if(nssp){
-  x.scope = nssp
- }
- x.name = name
- @return x;
-}
-scopeNewx ->(ns Cptx, name Str)Cptx{
- #x = dicNewx()
- @if(scopec){
-  x.class = scopec
- }
- @if(nssp){
-  x.scope = nssp
- }
- x.name = ns.name + "/" + name
- dicSetx(ns, name, x)
- @return x;
-}
-dicNewx ->(dic Dicx, arr Arr_Str, class Cptx)Cptx{
- #r = &Cptx{
-  type: T##DIC
-  
-  class: class
-  id: uidx()
-  
-  dic: dicOrx(dic)
- }
- @if(arr == _){
-  @if(dic != _){
-   @each k _ dic{
-    r.keys.push(k)
-   }
-  }@else{
-   r.keys = &Arr_Str
-  }
- }@else{
-  r.keys = arr
- }
- @return r
-}
-dicSetx ->(dic Cptx, key Str, val Cptx)Cptx{
- @if(dic.dic[name] == _){
-  dic.keys.push(name)
- }
- @return val
-}
-objNewx ->(class Cptx, dic Dicx)Cptx{
- #x = &Cptx{
-  type: T##OBJ
-  id: uidx()
-  dic: dicOrx(dic)
-  class: class
- }
- @return x
-}
 uidx ->()Uint{
  uidi ++
  @return uidi;
 }
 
-dicOrx ->(x Dicx)Dicx{
- @if(!x){
-  @return &Dicx
- }@else{
-  @return x
+classNewx ->(name Str, dic DicClassx, parents ArrClassx)Classx{
+ #x = &Classx{
+  type: T##CLASS
+  name: name
+  id: uidx()
+  dic: &DicClassx
  }
+ @if(dic){
+  x.dic = dic
+  @each k v dic{
+   @if(v.scope){
+    #nv = classNewx(k, _, [v]);
+    scopex(nv, x)
+   }@else{
+    scopex(v, x)    
+   }
+  }
+ }
+ @if(arr){
+  x.parents = parents
+  @each _ v parents{
+   @if(v.type > x.type){
+    x.type = v.type;
+   }
+  }
+ }@else{
+  x.parents = &ArrClassx
+ }
+ @return x;
 }
-callNativex ->(func Cptx, args Arrx, env Cptx)Cptx{
- @return call(Funcx(func.val), [args, env]);
+scopex ->(class Classx, scope Classx){
+ class.scope = scope;
+ scope.dic[class.name] = class;
 }
+classc := classNewx("Class");
+scopec := classNewx("Scope");
+rootc := classNewx("Root");
+rootc.class = scopec;
+scopex(rootc, rootc);
+idc := classNewx("Id", {
+ Def: scopec
+ Rec: scopec
+ Exe: scopec
+ Out: scopec
+});
+objc := classNewx("Obj");
+idNewx ->(name Str){
+ #x = objNewx(idc)
+ @return x;
+}
+basec := idNewx("Base")
 
-callNativex(mainsp.dic["Soul_main"], [], envmainv)
+objNewx ->(){
+ 
+}

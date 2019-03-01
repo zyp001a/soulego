@@ -1,0 +1,121 @@
+T := @enum OBJ CLASS TOBJ\
+ INT FLOAT NUMBIG STR BYTES ARR ARRSTR DIC\
+ ID CALL ARRMID DICMID
+Cptx := @type Cpt
+Arrx := @type Arr Cptx
+DicCptx := @type Dic Cptx
+Funcx ->(Arrx)Cptx
+Objx =>{
+ dic: Dicx
+ class: Classx
+}
+ArrClassx := @type Arr Classx
+Classx =>{
+ type: Cptx
+ obj: Objx
+ par: ArrClassx
+ dic: DicCptx
+}
+ArrStrx := @type Arr Str
+
+
+
+defns := nsNewx("def")
+execns := nsNewx("exec")
+mainsp := scopeNewx(defns, "main")
+idsp := scopeNewx(defns, "id")
+nssp := scopeNewx(defns, "ns")
+mainesp := scopeNewx(execns, "main")
+
+idmainv := objNewx()
+routex(idsp, "main", idmain)
+
+
+uidi := Uint(1)
+
+
+routex ->(o Cptx, scope Cptx, name Str)Cptx{
+ //TODO route name should not contain $ ?
+ #dic = scope.dic;
+ dic[name] = o 
+ o.name = name;
+ o.class = scope
+ @return o
+}
+nsNewx ->(name Str)Cptx{
+ Cptx#x = dicNewx()
+ @if(nsc){
+  x.class = nsc
+ }
+ @if(nssp){
+  x.scope = nssp
+ }
+ x.name = name
+ @return x;
+}
+scopeNewx ->(ns Cptx, name Str)Cptx{
+ #x = dicNewx()
+ @if(scopec){
+  x.class = scopec
+ }
+ @if(nssp){
+  x.scope = nssp
+ }
+ x.name = ns.name + "/" + name
+ dicSetx(ns, name, x)
+ @return x;
+}
+dicNewx ->(dic Dicx, arr Arr_Str, class Cptx)Cptx{
+ #r = &Cptx{
+  type: T##DIC
+  
+  class: class
+  id: uidx()
+  
+  dic: dicOrx(dic)
+ }
+ @if(arr == _){
+  @if(dic != _){
+   @each k _ dic{
+    r.keys.push(k)
+   }
+  }@else{
+   r.keys = &Arr_Str
+  }
+ }@else{
+  r.keys = arr
+ }
+ @return r
+}
+dicSetx ->(dic Cptx, key Str, val Cptx)Cptx{
+ @if(dic.dic[name] == _){
+  dic.keys.push(name)
+ }
+ @return val
+}
+objNewx ->(class Cptx, dic Dicx)Cptx{
+ #x = &Cptx{
+  type: T##OBJ
+  id: uidx()
+  dic: dicOrx(dic)
+  class: class
+ }
+ @return x
+}
+uidx ->()Uint{
+ uidi ++
+ @return uidi;
+}
+
+dicOrx ->(x Dicx)Dicx{
+ @if(!x){
+  @return &Dicx
+ }@else{
+  @return x
+ }
+}
+callNativex ->(func Cptx, args Arrx, env Cptx)Cptx{
+ @return call(Funcx(func.val), [args, env]);
+}
+
+callNativex(mainsp.dic["Soul_main"], [], envmainv)

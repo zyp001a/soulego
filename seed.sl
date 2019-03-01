@@ -104,7 +104,8 @@ idc := classNewx("Id", {
 });
 objc := classNewx("Obj");
 idNewx ->(name Str){
- #x = objNewx(idc)
+ # = objNewx(idc);
+ Classx(obj.val);
  @return x;
 }
 basec := idNewx("Base")

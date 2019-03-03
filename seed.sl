@@ -1,6 +1,6 @@
 T := @enum CLASS OBJ\
  INT FLOAT NUMBIG STR BYTES ARR ARRSTR DIC\
- ID CALL ARRMID DICMID
+ CALL ARROBJ DICOBJ
 Cptx := @type Cpt
 ArrCptx := @type Arr Cptx
 DicCptx := @type Dic Cptx
@@ -96,7 +96,7 @@ scopec := classNewx("Scope");
 rootc := classNewx("Root");
 rootc.class = scopec;
 scopex(rootc, rootc);
-idc := classNewx("Id", {
+domainc := classNewx("Domain", {
  Def: scopec
  Rec: scopec
  Exe: scopec

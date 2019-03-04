@@ -96,12 +96,7 @@ scopec := classNewx("Scope");
 rootc := classNewx("Root");
 rootc.class = scopec;
 scopex(rootc, rootc);
-domainc := classNewx("Domain", {
- Def: scopec
- Rec: scopec
- Exe: scopec
- Out: scopec
-});
+
 objc := classNewx("Obj");
 idNewx ->(name Str){
  # = objNewx(idc);

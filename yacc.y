@@ -338,6 +338,6 @@ void main()
 {
 	Ast *ast;
   if(!yyparse(&ast)){
-		printpretty(ast, 1);
+		print(ast);
 	}
 }	

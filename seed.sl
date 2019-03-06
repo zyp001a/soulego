@@ -1,7 +1,7 @@
 T := @enum CPT CLASS NULL\
  INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
- ARRSTR LOG\
- MID
+ ARRSTR\
+ LOG MID
 Cptx := @type Cpt
 ArrCptx := @type Arr Cptx
 DicCptx := @type Dic Cptx
@@ -41,28 +41,25 @@ Arrx => {
  len: Int
  size: Int 
 }
-StateDefx =>{
- parent: StateDefx
+UndStatex =>{
+ parent: UndStatex
  arr: ArrClassx
  dic: DicClassx
+ def: Classx
  id: Uint 
 }
-Statex =>{
- parent: Statex
+ExeStatex =>{
+ parent: ExeStatex
  arr: ArrCptx
  dic: DicCptx
- def: StateDefx
+ und: UndStatex
  id: Uint
 }
-ArrStatex := @type Arr Statex
-Envx =>{
- stack: ArrStatex
- state: Statex
- exe: Classx
-}
+
 Midx =>{
  func: Classx
  args: ArrCptx
+ ln: Uint
 }
 uidi := Uint(1)
 uidx ->()Uint{
@@ -105,6 +102,27 @@ scopex ->(class Classx, scope Classx){
  class.scope = scope;
  scope.dic[class.name] = class;
 }
+undStateNewx ->(def Classx, parent UndStatex)UndStatex{
+ #x = &UndStatex{
+  parent: parent
+  arr: &ArrClassx
+  dic: &DicClassx
+  def: def
+  id: uidx()
+ }
+ @return x
+}
+exeStateNewx ->(und UndStatex, parent ExeStatex)ExeStatex{
+ #x = &ExeStatex{
+  parent: parent
+  arr: &ArrClassx
+  dic: &DicClassx
+  und: und
+  id: uidx()
+ }
+ @return x
+}
+
 cptc := classNewx("Cpt");
 cptc.type = T##CPT
 classc := classNewx("Class", [cptc]);
@@ -119,58 +137,65 @@ scopeNewx ->(name Str, scope Classx)Classx{
  scopex(x, scope);
  @return x;
 }
-stateDefNewx ->(parent StateDefx)StateDefx{
- #x = &StateDefx{
-  parent: parent
-  arr: &ArrClassx
-  dic: &DicClassx
-  id: uidx()
- }
- @return x;
-}
-stateDefc := classNewx("StateDef", [cptc]);
-statec := classNewx("State", [cptc]);
-funcc := classNewx("Func", [cptc]);
-
-objc := classNewx("Obj", [cptc]);
-objc.type = T##DIC
-objNewx ->(class Classx, dic DicCptx){
-}
-
-strc := classNewx("Str", [cptc]);
-
-midc := classNewx("Mid", [cptc])
-midc.type = T##MID
-
 
 
 defc := scopeNewx("Def", rootc);
 exec := scopeNewx("Exe", rootc);
-Impc := scopeNewx("Imp", rootc);
 recc := scopeNewx("Rec", rootc);
-datac := scopeNewx("Data", rootc);
+undc := scopeNewx("Und", rootc);
+impc := scopeNewx("Imp", rootc);
+datc := scopeNewx("Dat", rootc);
+tesc := scopeNewx("Tes", rootc);
 
 defBasec := scopeNewx("Base", defc)
 exeBasec := scopeNewx("Base", exec)
+recBasec := scopeNewx("Base", recc)
+undBasec := scopeNewx("Base", undc)
+impBasec := scopeNewx("Base", impc)
+datBasec := scopeNewx("Base", datc)
+tesBasec := scopeNewx("Base", tesc)
+
+scopex(cptc, defBasec)
+scopex(classc, defBasec)
+scopex(scopec, defBasec)
+scopex(rootc, defBasec)
+
+defNewx ->(name Str, parents ArrClassx, dic DicClassx)Classx{
+ #x = classNewx(name, parents, dic)
+ scopex(x, defBasec);
+ @return x;
+}
+
+perc := defNewx("Per", [classc]);
+
+basec := defNewx("Base");
+basec.class = perc;
+idc := defNewx("Id", [basec]);
+segoc := defNewx("Sego", [idc]);//superego
 
 
-Idx =>{
- name: Str
- id: Uint
- exes: ArrClassx
+funcc := defNewx("Func", [cptc]);
+
+objc := defNewx("Obj", [cptc]);
+objc.type = T##DIC
+objNewx ->(class Classx, dic DicCptx){
 }
-idNewx ->()Idx{
- @return &Idx{
-  id: uidx()
-  exes: &ArrClassx
- }
-}
-idc := classNewx("Id", [cptc]);
-scopex(idc, defBasec);
-midNewx ->(func Classx, args ArrCptx)Midx{
+valc := defNewx("Val", [cptc]);
+strc := defNewx("Str", [valc]);
+numc := defNewx("Num", [valc]);
+intc := defNewx("Int", [numc]);
+
+jsonArrc := defNewx("JsonArr", [valc]);
+
+midc := defNewx("Mid", [cptc])
+midc.type = T##MID
+
+
+midNewx ->(func Classx, args ArrCptx, ln Uint)Midx{
  #x = &Midx{
   func: func
   args: args
+  ln: ln
  }
  @if(args == _){
   x.args =  &ArrCptx
@@ -197,7 +222,8 @@ cgetx ->(cl Classx, key Str, cache Dic)Cptx{
  }
  @return _;
 }
-getx ->(){
+getx ->(cl Classx, key Str)Cptx{
+ 
 }
 rgetx ->(cl Classx, cl2 Classx, key Str)Classx{
  #r = cl.dic[cl2.name]
@@ -227,23 +253,6 @@ rgetx ->(cl Classx, cl2 Classx, key Str)Classx{
  }
  @return _;
 }
-ast2midx ->(ast JsonArr, c Classx, sd StateDefx)Midx{
-}
-midx ->(mid Midx, env Envx)Cptx{
- #fc = mid.func;
- #f = rgetx(env.exe, fc.scope, fc.name)
- //check func
- @return callx(f, mid.args);
-}
-callx ->(func Classx, args ArrCptx)Cptx{
- @return call(func.func, [args])
-}
-funcNewx ->(c Classx, key Str, val Funcx, argtypes ArrClassx, return Classx)Classx{
- #x = classNewx(key, [funcc]);
- scopex(x, c);
- x.func = val; 
- @return x
-}
 inf := funcNewx(idc, "in", ->(arr ArrCptx)Cptx{
  @return "1"
  #osargs = @soul.getCmdArgs()
@@ -255,39 +264,111 @@ inf := funcNewx(idc, "in", ->(arr ArrCptx)Cptx{
   @return fc  
  }
  @return
-}, [idc], strc)
-outf := funcNewx(idc, "out", ->(arr ArrCptx)Cptx{
+}, [perc], strc)
+funcNewx(idc, "out", ->(arr ArrCptx)Cptx{
  #s = Str(arr[1])
  print(s)
-}, [idc, strc])
-//funcNewx(exeBasec, idc, "out", ->(arr ArrCptx)Cptx{
-//})
-recf := funcNewx(idc, "rec", ->(arr ArrCptx)Cptx{
- @return midNewx(outf, arr)
- #str = Str(arr[1])
+}, [strc])
+valf := funcNewx(valc, "val", ->(arr ArrCptx)Cptx{
+ @return arr[0]
+})
+
+funcNewx(undBasec, "units", ->(arr ArrCptx)Cptx{
+ #ast = JsonArr(arr[0])
+ @return undx(ast[1], arr[1], arr[2])
+})
+funcNewx(undBasec, "stat", ->(arr ArrCptx)Cptx{
+ #ast = JsonArr(arr[0])
+ #x = undx(ast[1], arr[1], arr[2])
+ x.ln = Uint(Float(ast[2]))
+ @return x
+})
+funcNewx(undBasec, "int", ->(arr ArrCptx)Cptx{
+ #ast = JsonArr(arr[0])
+ @return midNewx(valf, [Int(Str(ast[1]))]Cptx);
+})
+
+
+mainf := funcNewx(idc, "main", ->(arr ArrCptx)Cptx{
+ onx(idc, segoc, "1");
+})
+
+
+getDefx ->(self Classx, src Classx)Classx{
+ @return defBasec;
+}
+getRecx ->(self Classx, src Classx, msg Str)Classx{
+ @return recBasec;
+}
+getUndx ->(self Classx, src Classx, ast JsonArr)Classx{
+ @return undBasec;
+}
+getExex ->(self Classx, src Classx, mid Midx)Classx{
+ @return defBasec;
+}
+onx ->(self Classx, src Classx, msg Str){
+ #recsp = getRecx(self, src, msg);
+ #ast = recx(msg, recsp);
+ #undsp = getUndx(self, src, ast);
+ #defsp = getDefx(self, src); 
+ #undstt = undStateNewx(defsp)
+ #mid = undx(ast, undsp, undstt);
+ 
+ #exesp = getExex(self, src, mid);
+ #exestt = exeStateNewx(undstt);
+ #r = exex(mid, exesp, exestt);
+ log(r)
+}
+recx ->(str Str, rec Classx)JsonArr{
  #ast = JsonArr(osCmd(osEnvGet("HOME")+"/soulego/parser", str))
  @if(ast.len() == 0){
   die("progl2cpt: wrong grammar")
  }
- @return ast2midx(ast, defBasec, stateDefNewx());
-}, [strc], midc)
-bootstrapf := funcNewx(idc, "bootstrap", ->(arr ArrCptx)Cptx{
- #envMaino = &Envx{
-  stack: &ArrStatex
-  state: &Statex
-  exe: defBasec
+ log(ast)
+ @return ast
+}
+undx ->(ast JsonArr, und Classx, stt UndStatex)Midx{
+ #id = Str(ast[0])
+ #f = cgetx(und, id);
+ @if(!f){
+  log(ast)
+  log("ast error")
  }
- #idSelfo = idNewx() 
- #idMaino = idNewx()
- @for 1 {
-  #s = Str(callx(inf, [idSelfo, idMaino]Cptx))
-  #m = Midx(callx(recf, [idSelfo, s]Cptx))  
-  #r = midx(m, envMaino)
-  @if(r == _){
-  }
-  @break
+ @return callx(f, [ast, und, stt]Cptx)
+}
+exex ->(mid Midx, exe Classx, stt ExeStatex)Cptx{
+ #fc = mid.func;
+ #f = rgetx(exe, fc.scope, fc.name)
+ //check func
+ @if(!f){
+  log(exe.name + "/" + fc.scope.name + "/" + fc.name)  
+  log("no mid error")
  }
- @return _;
-})
+ @return callx(f, mid.args, stt);
+}
+callx ->(func Classx, args ArrCptx, stt ExeStatex)Cptx{
+ @if(!func.func){
+  log(func);
+  log("not func error");
+ }
+ @return call(func.func, [args])
+}
+funcNewx ->(c Classx, key Str, val Funcx, argtypes ArrClassx, return Classx)Classx{
+ #x = classNewx(key, [funcc]);
+ scopex(x, c);
+ x.func = val; 
+ @return x
+}
+rfuncNewx ->(sp Classx, c Classx, key Str, val Funcx)Classx{
+ #nc = cgetx(sp, c.name)
+ @if(nc == _){
+  #nc = classNewx(c.name);
+  scopex(nc, sp)
+ }
+ #x = classNewx(key, [funcc]);
+ scopex(x, nc);
+ x.func = val; 
+ @return x
+}
 
-callx(bootstrapf);
+callx(mainf);

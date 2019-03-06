@@ -1,12 +1,13 @@
 T := @enum CPT CLASS NULL\
  INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  ARRSTR LOG\
- FUNC MID
+ MID
 Cptx := @type Cpt
 ArrCptx := @type Arr Cptx
 DicCptx := @type Dic Cptx
 ArrClassx := @type Arr Classx
 DicClassx := @type Dic Classx
+Funcx ->(ArrCptx)Cptx
 Classx =>{
  type: T
  name: Str
@@ -19,6 +20,7 @@ Classx =>{
  
  obj: Cptx
  impl: Classx
+ func: Funcx
 }
 
 ArrStrx := @type Arr Str
@@ -58,13 +60,8 @@ Envx =>{
  state: Statex
  exe: Classx
 }
-FuncCptx ->(ArrCptx)Cptx
-Funcx =>{
- class: Classx
- val: FuncCptx
-}
 Midx =>{
- func: Funcx
+ func: Classx
  args: ArrCptx
 }
 uidi := Uint(1)
@@ -134,7 +131,6 @@ stateDefNewx ->(parent StateDefx)StateDefx{
 stateDefc := classNewx("StateDef", [cptc]);
 statec := classNewx("State", [cptc]);
 funcc := classNewx("Func", [cptc]);
-funcc.type = T##FUNC
 
 objc := classNewx("Obj", [cptc]);
 objc.type = T##DIC
@@ -171,7 +167,7 @@ idNewx ->()Idx{
 }
 idc := classNewx("Id", [cptc]);
 scopex(idc, defBasec);
-midNewx ->(func Funcx, args ArrCptx)Midx{
+midNewx ->(func Classx, args ArrCptx)Midx{
  #x = &Midx{
   func: func
   args: args
@@ -203,7 +199,7 @@ cgetx ->(cl Classx, key Str, cache Dic)Cptx{
 }
 getx ->(){
 }
-rgetx ->(cl Classx, cl2 Classx, key Str)Cptx{
+rgetx ->(cl Classx, cl2 Classx, key Str)Classx{
  #r = cl.dic[cl2.name]
  @if(r != _){
   r2 = r.dic[key]
@@ -234,21 +230,18 @@ rgetx ->(cl Classx, cl2 Classx, key Str)Cptx{
 ast2midx ->(ast JsonArr, c Classx, sd StateDefx)Midx{
 }
 midx ->(mid Midx, env Envx)Cptx{
- #fc = mid.func.class;
- #f = Funcx(rgetx(env.exe, fc.scope, fc.name))
+ #fc = mid.func;
+ #f = rgetx(env.exe, fc.scope, fc.name)
  //check func
  @return callx(f, mid.args);
 }
-callx ->(func Funcx, args ArrCptx)Cptx{
- @return call(func.val, [args])
+callx ->(func Classx, args ArrCptx)Cptx{
+ @return call(func.func, [args])
 }
-funcNewx ->(c Classx, key Str, val FuncCptx, argtypes ArrClassx, return Classx)Funcx{
- #fc = classNewx(key, [funcc]);
+funcNewx ->(c Classx, key Str, val Funcx, argtypes ArrClassx, return Classx)Classx{
+ #x = classNewx(key, [funcc]);
  scopex(x, c);
- #x = &Funcx{
-  class: fc
-  val: val
- }
+ x.func = val; 
  @return x
 }
 inf := funcNewx(idc, "in", ->(arr ArrCptx)Cptx{
@@ -270,7 +263,7 @@ outf := funcNewx(idc, "out", ->(arr ArrCptx)Cptx{
 //funcNewx(exeBasec, idc, "out", ->(arr ArrCptx)Cptx{
 //})
 recf := funcNewx(idc, "rec", ->(arr ArrCptx)Cptx{
- @return midNewx(outf, [Str(arr[1])]Cpt)
+ @return midNewx(outf, arr)
  #str = Str(arr[1])
  #ast = JsonArr(osCmd(osEnvGet("HOME")+"/soulego/parser", str))
  @if(ast.len() == 0){

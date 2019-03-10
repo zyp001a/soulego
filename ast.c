@@ -67,7 +67,7 @@ void print(Ast *ast)
   	fprintf(stdout, "%s", ast->str);
 		putchar('"');
 	}else{
-  	printf("%d", ast->len);				
+  	printf("\"%d\"", ast->len);				
 	}
 }
 void printpretty(Ast *ast, int ind)
@@ -96,7 +96,7 @@ void printpretty(Ast *ast, int ind)
   	fprintf(stdout, "%s", ast->str);
 		putchar('"');
 	}else{
-  	printf("%d", ast->len);				
+  	printf("\"%d\"", ast->len);				
 	}
 }
 void addnode(Ast *ast, Ast *subast)

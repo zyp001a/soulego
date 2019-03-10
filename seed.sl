@@ -128,50 +128,59 @@ cptc.type = T##CPT
 classc := classNewx("Class", [cptc]);
 classc.type = T##CLASS
 scopec := classNewx("Scope", [classc]);
-rootc := classNewx("Root");
-rootc.class = scopec;
-scopex(rootc, rootc);
-scopeNewx ->(name Str, scope Classx)Classx{
- #x = classNewx(name);
+rootsp := classNewx("Root");
+rootsp.class = scopec;
+scopex(rootsp, rootsp);
+scopeNewx ->(name Str, scope Classx, parents ArrClassx, dic DicClassx)Classx{
+ #x = classNewx(name, parents, dic);
  x.class = scopec;
  scopex(x, scope);
  @return x;
 }
 
 
-defc := scopeNewx("Def", rootc);
-exec := scopeNewx("Exe", rootc);
-recc := scopeNewx("Rec", rootc);
-undc := scopeNewx("Und", rootc);
-impc := scopeNewx("Imp", rootc);
-datc := scopeNewx("Dat", rootc);
-tesc := scopeNewx("Tes", rootc);
+defsp := scopeNewx("Def", rootsp);
+exesp := scopeNewx("Exe", rootsp);
+recsp := scopeNewx("Rec", rootsp);
+undsp := scopeNewx("Und", rootsp);
+impsp := scopeNewx("Imp", rootsp);
+datsp := scopeNewx("Dat", rootsp);
+tessp := scopeNewx("Tes", rootsp);
 
-defBasec := scopeNewx("Base", defc)
-exeBasec := scopeNewx("Base", exec)
-recBasec := scopeNewx("Base", recc)
-undBasec := scopeNewx("Base", undc)
-impBasec := scopeNewx("Base", impc)
-datBasec := scopeNewx("Base", datc)
-tesBasec := scopeNewx("Base", tesc)
+defBasesp := scopeNewx("Base", defsp)
+exeBasesp := scopeNewx("Base", exesp, [defBasesp])
+recBasesp := scopeNewx("Base", recsp)
+undBasesp := scopeNewx("Base", undsp)
+impBasesp := scopeNewx("Base", impsp)
+datBasesp := scopeNewx("Base", datsp)
+tesBasesp := scopeNewx("Base", tessp)
 
-scopex(cptc, defBasec)
-scopex(classc, defBasec)
-scopex(scopec, defBasec)
-scopex(rootc, defBasec)
+scopex(cptc, defBasesp)
+scopex(classc, defBasesp)
+scopex(scopec, defBasesp)
+scopex(rootsp, defBasesp)
+
+exeProjsp := scopeNewx("Proj", exesp);
+exeProjGolangsp := scopeNewx("ProjGolang", exesp, [exeProjsp]);
+exeProjNodejssp := scopeNewx("ProjNodejs", exesp, [exeProjsp]);
+exeIdsp := scopeNewx("Id", exesp, [exeBasesp, exeProjGolangsp, exeProjNodejssp]);
 
 defNewx ->(name Str, parents ArrClassx, dic DicClassx)Classx{
  #x = classNewx(name, parents, dic)
- scopex(x, defBasec);
+ scopex(x, defBasesp);
  @return x;
 }
 
 perc := defNewx("Per", [classc]);
 
-basec := defNewx("Base");
-basec.class = perc;
-idc := defNewx("Id", [basec]);
-segoc := defNewx("Sego", [idc]);//superego
+basepr := defNewx("Base");
+basepr.class = perc;
+idpr := defNewx("Id", [basepr]);
+idpr.class = perc
+segopr := defNewx("Sego", [basepr]);//superego
+segopr.class = perc
+adminpr := defNewx("Admin", [basepr]);//superego
+adminpr.class = perc
 
 
 funcc := defNewx("Func", [cptc]);
@@ -222,10 +231,27 @@ cgetx ->(cl Classx, key Str, cache Dic)Cptx{
  }
  @return _;
 }
+
 getx ->(cl Classx, key Str)Cptx{
  
 }
+undgetx ->(cl UndStatex, key Str, flag Int)Cptx{
+ #r = cl.dic[key];
+ @if(r){
+  @return midNewx();
+ }
+}
+exegetx ->(cl ExeStatex, key Str, flag Int)Cptx{
+ 
+}
 rgetx ->(cl Classx, cl2 Classx, key Str)Classx{
+ #r = subRgetx(cl, cl2, key)
+ @if(r){
+ //TODO cache
+  @return r;
+ }
+}
+subRgetx ->(cl Classx, cl2 Classx, key Str, limit Int)Classx{
  #r = cl.dic[cl2.name]
  @if(r != _){
   r2 = r.dic[key]
@@ -240,20 +266,29 @@ rgetx ->(cl Classx, cl2 Classx, key Str)Classx{
   log(key)    
  }
  @each _ v cl2.parents {
-  #rr = rgetx(cl, v, key)
+  #rr = subRgetx(cl, v, key, 1)
   @if(rr != _){
    @return rr;
   }
  }
+ @if(limit){
+  @return
+ }
+ @each _ v cl2.parents {
+  #rr = subRgetx(cl, v, "default", 1)
+  @if(rr != _){
+   @return rr;
+  }  
+ }
  @each _ v cl.parents {
-  #rr = rgetx(v, cl2, key)
+  #rr = subRgetx(v, cl2, key)
   @if(rr != _){
    @return rr;
   } 
  }
  @return _;
 }
-inf := funcNewx(idc, "in", ->(arr ArrCptx)Cptx{
+inf := funcNewx(perc, "in", ->(arr ArrCptx)Cptx{
  @return "1"
  #osargs = @soul.getCmdArgs()
  @if(osargs.len() == 1){
@@ -265,7 +300,7 @@ inf := funcNewx(idc, "in", ->(arr ArrCptx)Cptx{
  }
  @return
 }, [perc], strc)
-funcNewx(idc, "out", ->(arr ArrCptx)Cptx{
+funcNewx(perc, "out", ->(arr ArrCptx)Cptx{
  #s = Str(arr[1])
  print(s)
 }, [strc])
@@ -273,55 +308,80 @@ valf := funcNewx(valc, "val", ->(arr ArrCptx)Cptx{
  @return arr[0]
 })
 
-funcNewx(undBasec, "units", ->(arr ArrCptx)Cptx{
+funcNewx(undBasesp, "units", ->(arr ArrCptx)Cptx{
  #ast = JsonArr(arr[0])
  @return undx(ast[1], arr[1], arr[2])
 })
-funcNewx(undBasec, "stat", ->(arr ArrCptx)Cptx{
+funcNewx(undBasesp, "stat", ->(arr ArrCptx)Cptx{
  #ast = JsonArr(arr[0])
  #x = undx(ast[1], arr[1], arr[2])
- x.ln = Uint(Float(ast[2]))
+ x.ln = Uint(Str(ast[2]))
  @return x
 })
-funcNewx(undBasec, "int", ->(arr ArrCptx)Cptx{
+funcNewx(undBasesp, "int", ->(arr ArrCptx)Cptx{
  #ast = JsonArr(arr[0])
  @return midNewx(valf, [Int(Str(ast[1]))]Cptx);
 })
+funcNewx(undBasesp, "id", ->(arr ArrCptx)Cptx{
+ #ast = JsonArr(arr[0])
+ #sp = Classx(arr[1])
+ #stt = UndStatex(arr[2]) 
+ @return undgetx(stt, Str(ast[1]))
+})
+funcNewx(undBasesp, "call", ->(arr ArrCptx)Cptx{
+ #ast = JsonArr(arr[0])
+ #f = undx(ast[1], arr[1], arr[2])
+ @return midNewx(f);
+})
+
+funcNewx(exeProjGolangsp, "Main", ->(arr ArrCptx)Cptx{
+ #id = Classx(arr[0])
+ log(id)
+ @return;
+})
 
 
-mainf := funcNewx(idc, "main", ->(arr ArrCptx)Cptx{
- onx(idc, segoc, "1");
+funcNewx(perc, "rebear", ->(arr ArrCptx)Cptx{
+})
+mainf := funcNewx(perc, "main", ->(arr ArrCptx)Cptx{
+ onx(idpr, segopr, "bootstrap()"); 
+})
+funcNewx(perc, "bootstrap", ->(arr ArrCptx)Cptx{
+ #p = Classx(arr[0]);
+ #f = cgetx(exeProjGolangsp, "Main");
+ @return callx(f, [p]Cptx);
 })
 
 
 getDefx ->(self Classx, src Classx)Classx{
- @return defBasec;
+ @return defBasesp;
 }
 getRecx ->(self Classx, src Classx, msg Str)Classx{
- @return recBasec;
+ @return recBasesp;
 }
 getUndx ->(self Classx, src Classx, ast JsonArr)Classx{
- @return undBasec;
+ @return undBasesp;
 }
 getExex ->(self Classx, src Classx, mid Midx)Classx{
- @return defBasec;
+ @return exeIdsp;
 }
 onx ->(self Classx, src Classx, msg Str){
- #recsp = getRecx(self, src, msg);
- #ast = recx(msg, recsp);
- #undsp = getUndx(self, src, ast);
- #defsp = getDefx(self, src); 
- #undstt = undStateNewx(defsp)
- #mid = undx(ast, undsp, undstt);
+ #sprec = getRecx(self, src, msg);
+ #ast = recx(msg, sprec);
+ #spund = getUndx(self, src, ast);
+ #spdef = getDefx(self, src); 
+ #sttund = undStateNewx(spdef)
+ #mid = undx(ast, spund, sttund);
  
- #exesp = getExex(self, src, mid);
- #exestt = exeStateNewx(undstt);
- #r = exex(mid, exesp, exestt);
+ #spexe = getExex(self, src, mid);
+ #sttexe = exeStateNewx(sttund);
+ #r = exex(mid, spexe, sttexe);
  log(r)
 }
 recx ->(str Str, rec Classx)JsonArr{
  #ast = JsonArr(osCmd(osEnvGet("HOME")+"/soulego/parser", str))
  @if(ast.len() == 0){
+  log(ast)
   die("progl2cpt: wrong grammar")
  }
  log(ast)

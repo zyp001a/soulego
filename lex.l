@@ -71,12 +71,12 @@ int check_type();
 
 [;,\n\r]  { count(); return(ED); }
 
-("{"|"<%")		{ count(); return(L1); }
-("}"|"%>")		{ count(); return(R1); }
+("{"|"<%")		{ count(); return(L3); }
+("}"|"%>")		{ count(); return(R3); }
 ("["|"<:")		{ count(); return(L2); }
 ("]"|":>")		{ count(); return(R2); }
-"("			{ count(); return(L3); }
-")"			{ count(); return(R3); }
+"("			{ count(); return(L1); }
+")"			{ count(); return(R1); }
 ":"			{ count(); return(COLON); }
 "."			{ count(); return(DOT); }
 

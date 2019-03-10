@@ -257,6 +257,13 @@ postfix_expr
 }
 | postfix_expr L2 expr R2
 | postfix_expr L1 R1
+{
+	$$ = initnode("call");
+	addnode($$, $1);
+}
+| postfix_expr L1 args R1
+| postfix_expr DOT IDENTIFIER
+| postfix_expr INC
 | postfix_expr DEC
 ;
 
@@ -271,6 +278,18 @@ pri_expr
 }
 ;
 
+args
+: expr
+{
+	$$ = initnode("args");
+	addnode($$, $1);
+}
+| args ED expr
+{
+	$$ = $1;
+	addnode($$, $3);
+}
+;
 unary_op
 : NOT
 ;
@@ -286,6 +305,11 @@ cons
 : INT
 {
 	$$ = initnode("int");
+	addnode($$, $1);
+}
+| IDENTIFIER
+{
+	$$ = initnode("id");
 	addnode($$, $1);
 }
 ;

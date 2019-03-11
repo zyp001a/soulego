@@ -1,6 +1,7 @@
 T := @enum CPT CLASS NULL\
  INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  ARRSTR\
+ FUNC FUNCEXE\
  LOG MID
 Cptx := @type Cpt
 ArrCptx := @type Arr Cptx
@@ -8,6 +9,7 @@ DicCptx := @type Dic Cptx
 ArrClassx := @type Arr Classx
 DicClassx := @type Dic Classx
 Funcx ->(ArrCptx)Cptx
+FuncExex ->(ArrCptx, ExeStatex)Cptx
 Classx =>{
  type: T
  name: Str
@@ -20,7 +22,6 @@ Classx =>{
  
  obj: Cptx
  impl: Classx
- func: Funcx
 }
 
 ArrStrx := @type Arr Str
@@ -160,11 +161,6 @@ scopex(classc, defBasesp)
 scopex(scopec, defBasesp)
 scopex(rootsp, defBasesp)
 
-exeProjsp := scopeNewx("Proj", exesp);
-exeProjGolangsp := scopeNewx("ProjGolang", exesp, [exeProjsp]);
-exeProjNodejssp := scopeNewx("ProjNodejs", exesp, [exeProjsp]);
-exeIdsp := scopeNewx("Id", exesp, [exeBasesp, exeProjGolangsp, exeProjNodejssp]);
-
 defNewx ->(name Str, parents ArrClassx, dic DicClassx)Classx{
  #x = classNewx(name, parents, dic)
  scopex(x, defBasesp);
@@ -184,6 +180,9 @@ adminpr.class = perc
 
 
 funcc := defNewx("Func", [cptc]);
+funcc.type = T##FUNC
+funcexec := defNewx("FuncExe", [cptc]);
+funcexec.type = T##FUNCEXE
 
 objc := defNewx("Obj", [cptc]);
 objc.type = T##DIC
@@ -199,95 +198,9 @@ jsonArrc := defNewx("JsonArr", [valc]);
 midc := defNewx("Mid", [cptc])
 midc.type = T##MID
 
+undStatec := defNewx("UndState", [classc])
+exeStatec := defNewx("ExeState", [classc])
 
-midNewx ->(func Classx, args ArrCptx, ln Uint)Midx{
- #x = &Midx{
-  func: func
-  args: args
-  ln: ln
- }
- @if(args == _){
-  x.args =  &ArrCptx
- }
- @return x
-}
-
-cgetx ->(cl Classx, key Str, cache Dic)Cptx{
- #r = cl.dic[key]
- @if(r != _){
-  @return r
- }
- @if(cl.class.id == scopec.id){
-  //DBGET
- }
- @each _ v cl.parents {
-  #k = Str(v.id);
-  @if(cache[k] != _){ @continue };
-  cache[k] = 1;
-  r = cgetx(v, key, cache)
-  @if(r != _){
-   @return r;
-  }
- }
- @return _;
-}
-
-getx ->(cl Classx, key Str)Cptx{
- 
-}
-undgetx ->(cl UndStatex, key Str, flag Int)Cptx{
- #r = cl.dic[key];
- @if(r){
-  @return midNewx();
- }
-}
-exegetx ->(cl ExeStatex, key Str, flag Int)Cptx{
- 
-}
-rgetx ->(cl Classx, cl2 Classx, key Str)Classx{
- #r = subRgetx(cl, cl2, key)
- @if(r){
- //TODO cache
-  @return r;
- }
-}
-subRgetx ->(cl Classx, cl2 Classx, key Str, limit Int)Classx{
- #r = cl.dic[cl2.name]
- @if(r != _){
-  r2 = r.dic[key]
-  @if(r2 != _){
-   @return r2
-  }
- }
- @if(cl.class.id == scopec.id){
-  //DBGET
-  log(cl.dic)
-  log(cl2.name)
-  log(key)    
- }
- @each _ v cl2.parents {
-  #rr = subRgetx(cl, v, key, 1)
-  @if(rr != _){
-   @return rr;
-  }
- }
- @if(limit){
-  @return
- }
- @each _ v cl2.parents {
-  #rr = subRgetx(cl, v, "default", 1)
-  @if(rr != _){
-   @return rr;
-  }  
- }
- @each _ v cl.parents {
-  #rr = subRgetx(v, cl2, key)
-  @if(rr != _){
-   @return rr;
-  } 
- }
- @return _;
-}
 inf := funcNewx(perc, "in", ->(arr ArrCptx)Cptx{
  @return "1"
  #osargs = @soul.getCmdArgs()
@@ -304,8 +217,17 @@ funcNewx(perc, "out", ->(arr ArrCptx)Cptx{
  #s = Str(arr[1])
  print(s)
 }, [strc])
-valf := funcNewx(valc, "val", ->(arr ArrCptx)Cptx{
+valf := funcExeNewx(valc, "val", ->(arr ArrCptx, stt ExeStatex)Cptx{
  @return arr[0]
+})
+stateIdf := funcExeNewx(undStatec, "id", ->(arr ArrCptx, stt ExeStatex)Cptx{
+ #und = UndStatex(arr[0]);
+ #key = Str(arr[1]);
+ #exe = exeFindx(stt, und)
+ @if(!exe){
+  log("exe find error")
+ }
+ @return exeGetx(exe, key);
 })
 
 funcNewx(undBasesp, "units", ->(arr ArrCptx)Cptx{
@@ -326,7 +248,7 @@ funcNewx(undBasesp, "id", ->(arr ArrCptx)Cptx{
  #ast = JsonArr(arr[0])
  #sp = Classx(arr[1])
  #stt = UndStatex(arr[2]) 
- @return undgetx(stt, Str(ast[1]))
+ @return undGetx(stt, Str(ast[1]))
 })
 funcNewx(undBasesp, "call", ->(arr ArrCptx)Cptx{
  #ast = JsonArr(arr[0])
@@ -334,22 +256,25 @@ funcNewx(undBasesp, "call", ->(arr ArrCptx)Cptx{
  @return midNewx(f);
 })
 
-funcNewx(exeProjGolangsp, "Main", ->(arr ArrCptx)Cptx{
- #id = Classx(arr[0])
- log(id)
- @return;
+rfuncNewx(impBasesp, perc, "Main", ->(arr ArrCptx)Cptx{
+ #per = Classx(arr[0])
+ log(per)
+ @return "1";
 })
 
 
 funcNewx(perc, "rebear", ->(arr ArrCptx)Cptx{
 })
 mainf := funcNewx(perc, "main", ->(arr ArrCptx)Cptx{
- onx(idpr, segopr, "bootstrap()"); 
+ onx(idpr, segopr, "imp()"); 
 })
-funcNewx(perc, "bootstrap", ->(arr ArrCptx)Cptx{
+funcNewx(perc, "imp", ->(arr ArrCptx)Cptx{
  #p = Classx(arr[0]);
- #f = cgetx(exeProjGolangsp, "Main");
- @return callx(f, [p]Cptx);
+ #imp = cgetx(impsp, p.name);
+ #f = rgetx(imp, perc, "Main");
+ #r = callx(f, [p]Cptx);
+ print(#r);
+ @return; 
 })
 
 
@@ -407,16 +332,30 @@ exex ->(mid Midx, exe Classx, stt ExeStatex)Cptx{
  @return callx(f, mid.args, stt);
 }
 callx ->(func Classx, args ArrCptx, stt ExeStatex)Cptx{
- @if(!func.func){
+ @if(func.type == T##FUNC){
+  //process args
+  #nargs = []Cptx
+  @each _ arg args{
+   args.push(exex(arg, stt))
+  }
+  @return call(Funcx(func.val), [nargs])
+ }@elif(func.type == T##FUNCEXE){
+  @return call(FuncExex(func.val), [args, stt]) 
+ }@else{
   log(func);
-  log("not func error");
+  log("not func error"); 
  }
- @return call(func.func, [args])
 }
 funcNewx ->(c Classx, key Str, val Funcx, argtypes ArrClassx, return Classx)Classx{
  #x = classNewx(key, [funcc]);
  scopex(x, c);
- x.func = val; 
+ x.obj = val; 
+ @return x
+}
+funcExeNewx ->(c Classx, key Str, val FuncExex, argtypes ArrClassx, return Classx)Classx{
+ #x = classNewx(key, [funcexec]);
+ scopex(x, c);
+ x.obj = val; 
  @return x
 }
 rfuncNewx ->(sp Classx, c Classx, key Str, val Funcx)Classx{
@@ -429,6 +368,114 @@ rfuncNewx ->(sp Classx, c Classx, key Str, val Funcx)Classx{
  scopex(x, nc);
  x.func = val; 
  @return x
+}
+midNewx ->(func Classx, args ArrCptx, ln Uint)Midx{
+ #x = &Midx{
+  func: func
+  args: args
+  ln: ln
+ }
+ @if(args == _){
+  x.args =  &ArrCptx
+ }
+ @return x
+}
+
+cgetx ->(cl Classx, key Str, cache Dic)Cptx{
+ #r = cl.dic[key]
+ @if(r != _){
+  @return r
+ }
+ @if(cl.class.id == scopec.id){
+  //DBGET
+ }
+ @each _ v cl.parents {
+  #k = Str(v.id);
+  @if(cache[k] != _){ @continue };
+  cache[k] = 1;
+  r = cgetx(v, key, cache)
+  @if(r != _){
+   @return r;
+  }
+ }
+ @return _;
+}
+
+getx ->(cl Classx, key Str)Cptx{
+ 
+}
+undGetx ->(cl UndStatex, key Str, flag Int)Cptx{
+ #r = cl.dic[key];
+ @if(r){
+  @return midNewx(stateIdf, [cl, key]Cptx);
+ }
+ #r = undGetx(cl.und, key, 1)
+ @if(r){
+  @return r;
+ }
+ @if(flag){
+  @return
+ }
+ #r = cgetx(cl.def, key)
+ @if(r){
+  @return midNewx(valf, [r]Cptx); 
+ }
+}
+exeFindx ->(exe ExeStatex, und UndStatex)ExeStatex{
+ @if(exe.und.id == und.id){
+  @return exe;
+ }
+ @if(exe.parent == _){
+  @return
+ }
+ @return exeFindx(exe.parent, und)
+}
+exeGetx ->(exe ExeStatex, key Str)Cptx{
+ @return exe.dic[key];
+}
+rgetx ->(cl Classx, cl2 Classx, key Str)Classx{
+ #r = subRgetx(cl, cl2, key)
+ @if(r){
+ //TODO cache
+  @return r;
+ }
+}
+subRgetx ->(cl Classx, cl2 Classx, key Str, limit Int)Classx{
+ #r = cl.dic[cl2.name]
+ @if(r != _){
+  r2 = r.dic[key]
+  @if(r2 != _){
+   @return r2
+  }
+ }
+ @if(cl.class.id == scopec.id){
+  //DBGET
+  log(cl.dic)
+  log(cl2.name)
+  log(key)    
+ }
+ @each _ v cl2.parents {
+  #rr = subRgetx(cl, v, key, 1)
+  @if(rr != _){
+   @return rr;
+  }
+ }
+ @if(limit){
+  @return
+ }
+ @each _ v cl2.parents {
+  #rr = subRgetx(cl, v, "default", 1)
+  @if(rr != _){
+   @return rr;
+  }  
+ }
+ @each _ v cl.parents {
+  #rr = subRgetx(v, cl2, key)
+  @if(rr != _){
+   @return rr;
+  } 
+ }
+ @return _;
 }
 
 callx(mainf);

@@ -21,7 +21,7 @@ Classx =>{
  class: Classx
  
  obj: Cptx
- impl: Classx
+
 }
 
 ArrStrx := @type Arr Str
@@ -161,6 +161,9 @@ scopex(classc, defBasesp)
 scopex(scopec, defBasesp)
 scopex(rootsp, defBasesp)
 
+
+impIdsp := scopeNewx("Id", impsp, [impBasesp])
+
 defNewx ->(name Str, parents ArrClassx, dic DicClassx)Classx{
  #x = classNewx(name, parents, dic)
  scopex(x, defBasesp);
@@ -246,19 +249,35 @@ funcNewx(undBasesp, "int", ->(arr ArrCptx)Cptx{
 })
 funcNewx(undBasesp, "id", ->(arr ArrCptx)Cptx{
  #ast = JsonArr(arr[0])
- #sp = Classx(arr[1])
- #stt = UndStatex(arr[2]) 
+// #sp = Classx(arr[1])
+ #stt = UndStatex(arr[2])
  @return undGetx(stt, Str(ast[1]))
 })
 funcNewx(undBasesp, "call", ->(arr ArrCptx)Cptx{
  #ast = JsonArr(arr[0])
- #f = undx(ast[1], arr[1], arr[2])
- @return midNewx(f);
+ #stt = UndStatex(arr[2])
+ #funcast = JsonArr(ast[1]) 
+ #funcmid = undx(funcast, arr[1], stt)
+ #args =&ArrCptx
+ @if(!funcmid){
+  @if(funcast[0] == "id"){
+   #funcf = rgetx(stt.def, perc, funcast[1])
+   args.push(idpr);
+  }@else{
+   log(ast[1])
+   die("call error: no func")
+  }
+ }@else{
+  @if(funcmid.func.id == valf.id){
+   #funcf = funcmid.args[0]
+  }
+ }
+ @return midNewx(funcf, args)
 })
 
-rfuncNewx(impBasesp, perc, "Main", ->(arr ArrCptx)Cptx{
- #per = Classx(arr[0])
- log(per)
+rfuncNewx(impBasesp, perc, "main", ->(arr ArrCptx)Cptx{
+// #per = Classx(arr[0])
+ log(arr[0])
  @return "1";
 })
 
@@ -269,12 +288,14 @@ mainf := funcNewx(perc, "main", ->(arr ArrCptx)Cptx{
  onx(idpr, segopr, "imp()"); 
 })
 funcNewx(perc, "imp", ->(arr ArrCptx)Cptx{
+
  #p = Classx(arr[0]);
  #imp = cgetx(impsp, p.name);
- #f = rgetx(imp, perc, "Main");
+ #f = rgetx(imp, perc, "main");
  #r = callx(f, [p]Cptx);
  print(#r);
- @return; 
+
+ @return;
 })
 
 
@@ -288,7 +309,7 @@ getUndx ->(self Classx, src Classx, ast JsonArr)Classx{
  @return undBasesp;
 }
 getExex ->(self Classx, src Classx, mid Midx)Classx{
- @return exeIdsp;
+ @return exeBasesp;
 }
 onx ->(self Classx, src Classx, msg Str){
  #sprec = getRecx(self, src, msg);
@@ -301,7 +322,8 @@ onx ->(self Classx, src Classx, msg Str){
  #spexe = getExex(self, src, mid);
  #sttexe = exeStateNewx(sttund);
  #r = exex(mid, spexe, sttexe);
- log(r)
+ @if(r){
+ }
 }
 recx ->(str Str, rec Classx)JsonArr{
  #ast = JsonArr(osCmd(osEnvGet("HOME")+"/soulego/parser", str))
@@ -309,7 +331,7 @@ recx ->(str Str, rec Classx)JsonArr{
   log(ast)
   die("progl2cpt: wrong grammar")
  }
- log(ast)
+// log(ast)
  @return ast
 }
 undx ->(ast JsonArr, und Classx, stt UndStatex)Midx{
@@ -317,7 +339,7 @@ undx ->(ast JsonArr, und Classx, stt UndStatex)Midx{
  #f = cgetx(und, id);
  @if(!f){
   log(ast)
-  log("ast error")
+  die("ast error")
  }
  @return callx(f, [ast, und, stt]Cptx)
 }
@@ -327,23 +349,18 @@ exex ->(mid Midx, exe Classx, stt ExeStatex)Cptx{
  //check func
  @if(!f){
   log(exe.name + "/" + fc.scope.name + "/" + fc.name)  
-  log("no mid error")
+  die("no mid error")
  }
  @return callx(f, mid.args, stt);
 }
 callx ->(func Classx, args ArrCptx, stt ExeStatex)Cptx{
  @if(func.type == T##FUNC){
-  //process args
-  #nargs = []Cptx
-  @each _ arg args{
-   args.push(exex(arg, stt))
-  }
-  @return call(Funcx(func.val), [nargs])
+  @return call(Funcx(func.obj), [args])
  }@elif(func.type == T##FUNCEXE){
-  @return call(FuncExex(func.val), [args, stt]) 
+  @return call(FuncExex(func.obj), [args, stt]) 
  }@else{
   log(func);
-  log("not func error"); 
+  die("not func error"); 
  }
 }
 funcNewx ->(c Classx, key Str, val Funcx, argtypes ArrClassx, return Classx)Classx{
@@ -366,7 +383,7 @@ rfuncNewx ->(sp Classx, c Classx, key Str, val Funcx)Classx{
  }
  #x = classNewx(key, [funcc]);
  scopex(x, nc);
- x.func = val; 
+ x.obj = val; 
  @return x
 }
 midNewx ->(func Classx, args ArrCptx, ln Uint)Midx{
@@ -404,21 +421,23 @@ cgetx ->(cl Classx, key Str, cache Dic)Cptx{
 getx ->(cl Classx, key Str)Cptx{
  
 }
-undGetx ->(cl UndStatex, key Str, flag Int)Cptx{
+undGetx ->(cl UndStatex, key Str, flag Int)Midx{
  #r = cl.dic[key];
  @if(r){
   @return midNewx(stateIdf, [cl, key]Cptx);
  }
- #r = undGetx(cl.und, key, 1)
- @if(r){
-  @return r;
+ @if(cl.parent){
+  #rr = undGetx(cl.parent, key, 1)
+  @if(rr){
+   @return rr;
+  }
  }
  @if(flag){
   @return
  }
- #r = cgetx(cl.def, key)
- @if(r){
-  @return midNewx(valf, [r]Cptx); 
+ #rrr = cgetx(cl.def, key)
+ @if(rrr){
+  @return midNewx(valf, [rrr]Cptx); 
  }
 }
 exeFindx ->(exe ExeStatex, und UndStatex)ExeStatex{
@@ -450,9 +469,9 @@ subRgetx ->(cl Classx, cl2 Classx, key Str, limit Int)Classx{
  }
  @if(cl.class.id == scopec.id){
   //DBGET
-  log(cl.dic)
-  log(cl2.name)
-  log(key)    
+//  log(cl.dic)
+//  log(cl2.name)
+//  log(key)    
  }
  @each _ v cl2.parents {
   #rr = subRgetx(cl, v, key, 1)

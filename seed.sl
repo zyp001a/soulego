@@ -277,8 +277,7 @@ funcNewx(undBasesp, "call", ->(arr ArrCptx)Cptx{
 
 rfuncNewx(impBasesp, perc, "main", ->(arr ArrCptx)Cptx{
 // #per = Classx(arr[0])
- log(arr[0])
- @return "1";
+ @return "main()";
 })
 
 
@@ -293,8 +292,9 @@ funcNewx(perc, "imp", ->(arr ArrCptx)Cptx{
  #imp = cgetx(impsp, p.name);
  #f = rgetx(imp, perc, "main");
  #r = callx(f, [p]Cptx);
- print(#r);
-
+ @if(r){
+  log(r)
+ }
  @return;
 })
 
@@ -311,7 +311,7 @@ getUndx ->(self Classx, src Classx, ast JsonArr)Classx{
 getExex ->(self Classx, src Classx, mid Midx)Classx{
  @return exeBasesp;
 }
-onx ->(self Classx, src Classx, msg Str){
+onx ->(self Classx, src Classx, msg Str)Cptx{
  #sprec = getRecx(self, src, msg);
  #ast = recx(msg, sprec);
  #spund = getUndx(self, src, ast);
@@ -321,9 +321,7 @@ onx ->(self Classx, src Classx, msg Str){
  
  #spexe = getExex(self, src, mid);
  #sttexe = exeStateNewx(sttund);
- #r = exex(mid, spexe, sttexe);
- @if(r){
- }
+ @return exex(mid, spexe, sttexe);
 }
 recx ->(str Str, rec Classx)JsonArr{
  #ast = JsonArr(osCmd(osEnvGet("HOME")+"/soulego/parser", str))

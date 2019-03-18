@@ -82,3 +82,21 @@ exec <-- def --> out
   |       |
 	        
    --   mon
+
+Cpt
+CptCpt -> Class
+func -> Class -> method
+Class -> prop
+
+
+base
+ Per/main
+ Per/rebear 
+ Per/imp(Mid) -> Str
+ Soullang/read(Str) -> Mid
+ 
+golang
+ Per/imp(Mid) -> Str
+ 
+ Golang/build(Proj)
+id

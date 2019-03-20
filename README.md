@@ -83,11 +83,6 @@ exec <-- def --> out
 	        
    --   mon
 
-Cpt
-CptCpt -> Class
-func -> Class -> method
-Class -> prop
-
 
 base
  Per/main
@@ -100,3 +95,14 @@ golang
  
  Golang/build(Proj)
 id
+
+
+
+Cpt
+CptCpt -> Class
+func -> Class -> method
+
+db
+ BASE
+ 
+ ID

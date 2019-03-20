@@ -1,7 +1,6 @@
 D			[0-9]
 L			[a-zA-Z_]
 H			[a-fA-F0-9]
-E			[Ee][+-]?{D}+
 ID    [a-zA-Z_][a-zA-Z_0-9]*
 
 %{
@@ -18,82 +17,20 @@ int check_type();
 %%
 "/*"			{ comment(); }
 
-"@switch"		{ count(); return(SWITCH); }
-"@case"			{ count(); return(CASE); }
-"@default"		{ count(); return(DEFAULT); }
-
-"@for"			{ count(); return(FOR); }
-"@each"			{ count(); return(EACH); }
-
-"@goto"			{ count(); return(GOTO); }
-"@break"			{ count(); return(BREAK); }
-"@continue"		{ count(); return(CONTINUE); }
-
-"@return"		{ count(); return(RETURN); }
-
-"@if"			{ count(); return(IF); }
-"@else"			{ count(); return(ELSE); }
-"@elif"			{ count(); unput_if(); return(ELSE); }
-
 {ID}		{ count(); yylval = initstr(yytext); return(check_type()); }
 
-0[xX]{H}+{ID}?		{ count(); yylval = initstr(yytext); return(HEX); }
-0{D}+{ID}?		{ count(); yylval = initstr(yytext); return(OCT); }
 {D}+{ID}?		{ count(); yylval = initstr(yytext); return(INT); }
-@'(\\.|[^\\'])+'	{ count(); yylval = initstr(yytext); return(BYTE); }
-
-{D}+{E}{ID}?		{ count(); yylval = initstr(yytext); return(INTSCI); }
-{D}*"."{D}+({E})?{ID}?	{ count(); yylval = initstr(yytext); return(FLOAT); }
-{D}+"."{D}*({E})?{ID}?	{ count(); yylval = initstr(yytext); return(FLOATSCI); }
+{D}*"."{D}+{ID}?	{ count(); yylval = initstr(yytext); return(FLOAT); }
 
 {ID}?'(\\.|[^\\'])+'	{ count(); yylval = initstr(yytext); return(STR); }
 {ID}?\"(\\.|[^\\"])*\"	{ count(); yylval = initstr(yytext); return(STR); }
 
-"..."			{ count(); return(ELLIPSIS); }
-
-"+="			{ count(); return(ADD_ASSIGN); }
-"-="			{ count(); return(SUB_ASSIGN); }
-"*="			{ count(); return(MUL_ASSIGN); }
-"/="			{ count(); return(DIV_ASSIGN); }
-"%="			{ count(); return(MOD_ASSIGN); }
-
-"++"			{ count(); return(INC); }
-"--"			{ count(); return(DEC); }
-"&&"			{ count(); return(AND); }
-"||"			{ count(); return(OR); }
-"<="			{ count(); return(LE); }
-">="			{ count(); return(GE); }
-"=="			{ count(); return(EQ); }
-"!="			{ count(); return(NE); }
-
-"->"			{ count(); return(DEF1); }
-"=>"			{ count(); return(DEF2); }
-
 [;,\n\r]  { count(); return(ED); }
 
-("{"|"<%")		{ count(); return(L3); }
-("}"|"%>")		{ count(); return(R3); }
-("["|"<:")		{ count(); return(L2); }
-("]"|":>")		{ count(); return(R2); }
-"("			{ count(); return(L1); }
-")"			{ count(); return(R1); }
-":"			{ count(); return(COLON); }
-"."			{ count(); return(DOT); }
-
-"="			{ count(); return(ASSIGN); }
-
-"&"			{ count(); return(AMP); }
-"!"			{ count(); return(NOT); }
-
-"+"			{ count(); return(ADD); }
-"-"			{ count(); return(SUB); }
-"*"			{ count(); return(MUL); }
-"/"			{ count(); return(DIV); }
-"%"			{ count(); return(MOD); }
-"<"			{ count(); return(LT); }
-">"			{ count(); return(GT); }
-"?"			{ count(); return(QUES); }
-
+"{"		{ count(); return('{'); }
+"}"		{ count(); return('}'); }
+"("		{ count(); return('('); }
+")"		{ count(); return(')'); }
 
 [ \t\v\f]		{ count(); }
 <<EOF>>  {  static int once = 0; return once++ ? 0 : ED; }
@@ -171,12 +108,12 @@ int check_type()
 *	if (yytext == type_name)
 *		return(TYPE_NAME);
 *
-*	return(IDENTIFIER);
+*	return(ID);
 */
 
 /*
 *	it actually will only return IDENTIFIER
 */
 
-	return(IDENTIFIER);
+	return(ID);
 }

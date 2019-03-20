@@ -77,20 +77,35 @@ cptc := classNewx("Cpt");
 cptc.type = T##CPT
 classc := classNewx("Class", cptc);
 classc.type = T##CLASS
-scopec := classNewx("Scope", classc);
+classScopec := classNewx("ClassScope", classc);
 rootsp := classNewx("Root");
 rootsp.class = scopec;
 scopex(rootsp, rootsp);
 
-basesp := scopeClassNewx("Base", rootsp);
+basesp := classScopeNewx("Base", rootsp);
 
+scopex(cptc, basesp)
+scopex(classc, basesp)
+scopex(classScopec, basesp)
+scopex(rootsp, basesp)
+
+
+adminsp := classScopeNewx("Admin", rootsp, basesp);
+selfsp := classScopeNewx("Self", rootsp, basesp);
+
+
+classStatec := defNewx("ClassState", classc);
+
+classScopeFuncc := defNewx("ClassScopeFunc", classScopec);
 
 funcc := defNewx("Func", cptc);
 funcc.type = T##FUNC
-funcstatec := defNewx("FuncState", cptc);
-funcstatec.type = T##FUNCSTATE
-funcclassc := defNewx("FuncClass", cptc);
-funcclassc.type = T##FUNCCLASS
+funcStatec := defNewx("FuncState", cptc);
+funcStatec.type = T##FUNCSTATE
+funcClassc := defNewx("FuncClass", cptc);
+funcClassc.type = T##FUNCCLASS
+
+voidc := defNewx("Void", cptc);
 
 valc := defNewx("Val", cptc);
 strc := defNewx("Str", valc);
@@ -104,13 +119,41 @@ midc.type = T##MID
 
 logf := funcNewx(basesp, "log", ->(arr ArrCptx)Cpt{
  log(arr[0]);
+}, cptc)
+undf := funcNewx(basesp, "und", ->(arr ArrCptx)Cpt{
+ #ast = JsonArr(arr[0])
+ @return undx(ast, classStateNewx(undsp))
+}, jsonArrc, midc)
+recf := funcNewx(basesp, "rec", ->(arr ArrCptx)Cpt{
+ #str = Str(arr[0])
+ #ast = JsonArr(osCmd(osEnvGet("HOME")+"/soulego/parser", str))
+ @if(ast.len() == 0){
+  log(ast)
+  die("progl2cpt: wrong grammar")
+ }
+// log(ast)
+ @return ast
+}, strc, jsonArrc)
+rebearf := funcNewx(basesp, "rebear", ->(arr ArrCptx)Cpt{
+ 
 })
+selfStartf := funcNewx(basesp, "start", ->(arr ArrCptx)Cpt{
+ #osargs = @soul.getCmdArgs()
+ @if(osargs.len() == 1){
+  log("./soul3 [FILE] [EXECFLAG] [DEFFLAG]")
+  @soul.exit(0)
+ }@else{
+  Str#fc = @fs[osargs[1]]
+  JsonArr#ast = callx(recf, [fc]Cpt)
+//  Midx#mid = callx(undf, [ast]Cpt)  
+  log(ast)
+ }
+}, selfsp)
+adminStartf := funcNewx(basesp, "start", ->(arr ArrCptx)Cpt{
+ callx(selfStartf)
+}, adminsp)
 mainf := funcNewx(basesp, "main", ->(arr ArrCptx)Cpt{
-//start(Sego)
-// Sego loop, listen for signal
-//start(Id)
-// onx(idpr, segopr, "imp()");
- callx(logf, [1]Cpt)
+ callx(adminStartf)
 })
 
 callx(mainf);
@@ -161,13 +204,18 @@ classNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
  }
  @return x;
 }
-scopeClassNewx ->(name Str, scope Classx, prt Classx, alt Classx, dic DicClassx)Classx{
+classScopeNewx ->(name Str, scope Classx, prt Classx, alt Classx, dic DicClassx)Classx{
  #x = classNewx(name, prt, alt, dic);
- x.class = scopec;
+ x.class = classScopec;
  scopex(x, scope);
  @return x;
 }
-stateClassNewx ->(){
+classStateNewx ->(scope Classx, prt Classx)Classx{
+ #name = Str(uidx());
+ #x = classNewx(name, prt);
+ x.class = classStatec;
+ scopex(x, scope);
+ @return x;
 }
 stateNewx ->(class Classx, prt Statex)Statex{
  #x = &Statex{
@@ -179,17 +227,27 @@ stateNewx ->(class Classx, prt Statex)Statex{
  }
  @return x
 }
-funcNewx ->(sp Classx, key Str, val Funcx, argtypes ArrClassx, return Classx)Classx{
+funcNewx ->(sp Classx, key Str, val Funcx, m Classx, return Classx, argtypes ArrClassx)Classx{
  //get func class from argtypes and return
- #fc = funcc
- #x = classNewx(key, fc);
- scopex(x, sp);
- x.obj = val; 
- @return x
+ #x = cget(x, key)
+ @if(!x){
+  #x = classNewx(key);
+  x.class = classScopeFuncc;
+  scopex(x, sp);
+ }
+
+ #fc = funcc;
+ @if(!m){
+  m = voidc
+ }
+ y = classNewx(m.name, fc)
+ scopex(y, x)
+ y.obj = val;    
+ @return y
 }
 funcStateNewx ->(sp Classx, key Str, val FuncStatex)Classx{
  //get func class from argtypes and return
- #fc = funcstatec
+ #fc = funcStatec
  #x = classNewx(key, fc);
  scopex(x, sp);
  x.obj = val; 
@@ -197,7 +255,7 @@ funcStateNewx ->(sp Classx, key Str, val FuncStatex)Classx{
 }
 funcClassNewx ->(sp Classx, key Str, val FuncClassx)Classx{
  //get func class from argtypes and return
- #fc = funcclassc
+ #fc = funcClassc
  #x = classNewx(key, fc);
  scopex(x, sp);
  x.obj = val; 
@@ -210,5 +268,47 @@ defNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
 }
 callx ->(func Classx, args ArrCptx)Cpt{
  @return call(Funcx(func.obj), [args])
+}
+callClassx ->(func Classx, args ArrCptx, cl Classx)Cpt{
+ @return call(FuncClassx(func.obj), [args, cl])
+}
+cgetx ->(cl Classx, key Str, cache Dic)Cptx{
+ #r = cl.dic[key]
+ @if(r != _){
+  @return r
+ }
+ @if(cl.class.id == scopec.id){
+  //DBGET
+ }
+ @if(cl.prt){
+  #v = cl.prt
+  #k = Str(v.id);
+  @if(cache[k] != _){ @continue };
+  cache[k] = 1;
+  r = cgetx(v, key, cache)
+  @if(r != _){
+   @return r;
+  }
+ }
+ @if(cl.alt){
+  #v = cl.alt
+  #k = Str(v.id);
+  @if(cache[k] != _){ @continue };
+  cache[k] = 1;
+  r = cgetx(v, key, cache)
+  @if(r != _){
+   @return r;
+  }
+ }
+ @return _;
+}
+undx ->(ast JsonArr, cl Classx)Midx{
+ #id = Str(ast[0])
+ #f = cgetx(cl.scope, id, {});
+ @if(!f){
+  log(ast)
+  die("ast error")
+ }
+ @return callClassx(f, [ast]Cptx, cl)
 }
 

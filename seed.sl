@@ -1,9 +1,8 @@
-T := @enum CPT CLASS NULL\
+T := @enum CPT OBJ CLASS NULL\
  INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
- ARRSTR\
  FUNC FUNCSTATE FUNCCLASS\
- LOG MID\
- STATE
+ MID STATE\
+ ARRRAW DICRAW
 ArrCptx := @type Arr Cpt
 DicCptx := @type Dic Cpt
 ArrClassx := @type Arr Classx
@@ -73,16 +72,26 @@ Midx =>{
 
 uidi := Uint(1)
 
-cptc := classNewx("Cpt");
-cptc.type = T##CPT
-classc := classNewx("Class", cptc);
-classc.type = T##CLASS
+cptc := &Classx{
+ type: T##CPT
+ name: "Cpt"
+ id: uidx()
+ dic: &DicCptx
+}
+classc := &Classx{
+ type: T##CLASS
+ name: "Class"
+ id: uidx()
+ dic: &DicCptx
+}
+cptc.class = classc
+classc.class = classc
 classScopec := classNewx("ClassScope", classc);
-rootsp := classNewx("Root");
-rootsp.class = scopec;
+rootsp := classNewx("Scope_Root");
+rootsp.class = classScopec;
 scopex(rootsp, rootsp);
 
-basesp := classScopeNewx("Base", rootsp);
+basesp := classScopeNewx("Scope_Base", rootsp);
 
 scopex(cptc, basesp)
 scopex(classc, basesp)
@@ -90,31 +99,37 @@ scopex(classScopec, basesp)
 scopex(rootsp, basesp)
 
 
-adminsp := classScopeNewx("Admin", rootsp, basesp);
-selfsp := classScopeNewx("Self", rootsp, basesp);
+
+bnfsp := classScopeNewx("Scope_Bnf", rootsp, basesp)
+adminsp := classScopeNewx("Scope_Admin", rootsp, basesp);
+selfsp := classScopeNewx("Scope_Self", rootsp, basesp);
+
+objc := classxNewx("Objc", cptc);
+objc.type = T##OBJ
+
+classTmpc := classxNewx("ClassTmp", classc);
+classStatec := classxNewx("ClassState", classTmpc);
+
+classScopeFuncc := classxNewx("ClassScopeFunc", classScopec);
 
 
-classStatec := defNewx("ClassState", classc);
-
-classScopeFuncc := defNewx("ClassScopeFunc", classScopec);
-
-funcc := defNewx("Func", cptc);
+funcc := classxNewx("Func", cptc);
 funcc.type = T##FUNC
-funcStatec := defNewx("FuncState", cptc);
+funcStatec := classxNewx("FuncState", cptc);
 funcStatec.type = T##FUNCSTATE
-funcClassc := defNewx("FuncClass", cptc);
+funcClassc := classxNewx("FuncClass", cptc);
 funcClassc.type = T##FUNCCLASS
 
-voidc := defNewx("Void", cptc);
+voidc := classxNewx("Void", cptc);
 
-valc := defNewx("Val", cptc);
-strc := defNewx("Str", valc);
-numc := defNewx("Num", valc);
-intc := defNewx("Int", numc);
+valc := classxNewx("Val", cptc);
+strc := classxNewx("Str", valc);
+numc := classxNewx("Num", valc);
+intc := classxNewx("Int", numc);
 
-jsonArrc := defNewx("JsonArr", valc);
+jsonArrc := classxNewx("JsonArr", valc);
 
-midc := defNewx("Mid", cptc)
+midc := classxNewx("Mid", cptc)
 midc.type = T##MID
 
 logf := funcNewx(basesp, "log", ->(arr ArrCptx)Cpt{
@@ -122,7 +137,7 @@ logf := funcNewx(basesp, "log", ->(arr ArrCptx)Cpt{
 }, cptc)
 undf := funcNewx(basesp, "und", ->(arr ArrCptx)Cpt{
  #ast = JsonArr(arr[0])
- @return undx(ast, classStateNewx(undsp))
+ @return undx(ast, classStateNewx(bnfsp))
 }, jsonArrc, midc)
 recf := funcNewx(basesp, "rec", ->(arr ArrCptx)Cpt{
  #str = Str(arr[0])
@@ -173,8 +188,9 @@ scopex ->(class Classx, scope Classx){
 }
 classNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
  #x = &Classx{
-  type: T##CLASS
+  type: T##OBJ
   name: name
+  class: classc
   id: uidx()
  }
  @if(dic != _){
@@ -217,6 +233,7 @@ classStateNewx ->(scope Classx, prt Classx)Classx{
  scopex(x, scope);
  @return x;
 }
+
 stateNewx ->(class Classx, prt Statex)Statex{
  #x = &Statex{
   prt: prt
@@ -229,7 +246,7 @@ stateNewx ->(class Classx, prt Statex)Statex{
 }
 funcNewx ->(sp Classx, key Str, val Funcx, m Classx, return Classx, argtypes ArrClassx)Classx{
  //get func class from argtypes and return
- #x = cget(x, key)
+ #x = cgetx(sp, key)
  @if(!x){
   #x = classNewx(key);
   x.class = classScopeFuncc;
@@ -261,7 +278,7 @@ funcClassNewx ->(sp Classx, key Str, val FuncClassx)Classx{
  x.obj = val; 
  @return x
 }
-defNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
+classxNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
  #x = classNewx(name, prt, alt, dic)
  scopex(x, basesp);
  @return x;
@@ -272,32 +289,53 @@ callx ->(func Classx, args ArrCptx)Cpt{
 callClassx ->(func Classx, args ArrCptx, cl Classx)Cpt{
  @return call(FuncClassx(func.obj), [args, cl])
 }
-cgetx ->(cl Classx, key Str, cache Dic)Cptx{
+cinx ->(cl Classx, tar Classx)Bool{
+ @if(cl.id == tar.id){
+  @return @true
+ }
+ @if(cl.prt){
+  #r = cinx(cl.prt, tar);
+  @if(r){
+   @return r;
+  }
+ }
+ @if(cl.alt){
+  #r = cinx(cl.alt, tar);
+  @if(r){
+   @return r;
+  }
+ }
+ @return @false
+ //TODO cache
+}
+cgetx ->(cl Classx, key Str, cache Dic)Classx{
  #r = cl.dic[key]
  @if(r != _){
   @return r
  }
- @if(cl.class.id == scopec.id){
+ @if(cinx(cl.class, classTmpc)){
   //DBGET
  }
  @if(cl.prt){
-  #v = cl.prt
+  #v = cl.prt;
   #k = Str(v.id);
-  @if(cache[k] != _){ @continue };
-  cache[k] = 1;
-  r = cgetx(v, key, cache)
-  @if(r != _){
-   @return r;
+  @if(cache[k] == _){
+   cache[k] = 1;
+   r = cgetx(v, key, cache)
+   @if(r != _){
+    @return r;
+   }
   }
  }
  @if(cl.alt){
   #v = cl.alt
   #k = Str(v.id);
-  @if(cache[k] != _){ @continue };
-  cache[k] = 1;
-  r = cgetx(v, key, cache)
-  @if(r != _){
-   @return r;
+  @if(cache[k] == _){
+   cache[k] = 1;
+   r = cgetx(v, key, cache)
+   @if(r != _){
+    @return r;
+   }
   }
  }
  @return _;
@@ -307,8 +345,8 @@ undx ->(ast JsonArr, cl Classx)Midx{
  #f = cgetx(cl.scope, id, {});
  @if(!f){
   log(ast)
-  die("ast error")
+  die("ast error, not defined "+ id)
  }
- @return callClassx(f, [ast]Cptx, cl)
+ @return callClassx(f, [ast]Cpt, cl)
 }
 

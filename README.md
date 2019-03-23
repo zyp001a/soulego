@@ -1,5 +1,11 @@
 It is not a program, it is a creature.
 
+abc -> func
+abcAbc -> func
+Abc -> class
+AbcAbc -> class
+Abc_Abc -> special class
+_* -> base class
 
 Base
 Root

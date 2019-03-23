@@ -11,4 +11,4 @@ node_modules
 *.yy.c
 *.cache
 parser
-seed.sl.exec
+*.sl.exec

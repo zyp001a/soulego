@@ -1,12 +1,11 @@
-@load "seedfunc"
-
+@load "seedmem"
 Midx =>{
  func: Classx
  args: ArrCptx
  ln: Uint
 }
 
-midns := classNsNewx("mid", funcns);
+midns := classNsNewx("mid", memns);
 nsx(midns, midns)
 
 midc := classxNewx("Mid", midns)
@@ -22,4 +21,6 @@ midNewx ->(func Classx, args ArrCptx, ln Uint)Midx{
   x.args =  &ArrCptx
  }
  @return x
+}
+typepredx ->(mid Midx)Classx{
 }

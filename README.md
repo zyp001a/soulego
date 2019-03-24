@@ -1,5 +1,5 @@
 It is not a program, it is a creature.
-
+base func mem mid exec bnf soul 
 
 abc -> func
 abcAbc -> func alt

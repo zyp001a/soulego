@@ -1,7 +1,7 @@
 T := @enum CLASS CLASSMEM CLASSNS\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  FUNC FUNCMEM FUNCCLASSMEM\
- MID STATE\
+ MID MEM DYM\
  ARRRAW DICRAW
 ArrCptx := @type Arr Cpt
 DicCptx := @type Dic Cpt
@@ -72,6 +72,7 @@ objc.type = T##OBJ
 
 voidc := classxNewx("Void", basens);
 anyc := classxNewx("Any", basens);
+dymc := classxNewx("Dym", basens);
 
 valc := classxNewx("Val", basens);
 strc := classxNewx("Str", basens, valc);
@@ -91,11 +92,7 @@ nsx ->(class Classx, ns Classx){
 
 //NOT NECESSARY
  @if(ns.type == T##CLASSNS){
-  @if(ns.ns){
-   class.path = ns.ns.name + "/" + ns.name + "/" + class.name
-  }@else{
-   class.path = ns.name + "/" + class.name
-  }
+  class.path = Str(ns.obj) + "/" + class.name
  }
  
 }
@@ -137,6 +134,7 @@ classNsNewx ->(name Str, prt Classx, alt Classx)Classx{
  #x = classNewx("Ns_"+name, prt, alt);
  x.type = T##CLASSNS
  x.class = classNsc;
+ x.obj = name;
  @return x;
 }
 objxNewx ->(name Str, ns Classx, class Classx, dic DicCptx)Classx{

@@ -70,7 +70,7 @@ sentence
 ;
 
 words
-: word 
+: ID 
 {
 	$$ = initnode("words");	
 	addnode($$, $1);

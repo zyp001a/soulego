@@ -38,6 +38,7 @@ undNewx("words", ->(arr ArrCptx, cl Classx)Cpt{
   #arg = undx(e, cl)
   args.push(arg)
  }
+ //TODO fill empty
  @if(args.len() == 0){
   #c = voidc
  }@else{
@@ -45,6 +46,8 @@ undNewx("words", ->(arr ArrCptx, cl Classx)Cpt{
  }
  #func = cgetx(nsfunc, c.name);
  @if(!func){
+  log(nsfunc.name)   
+  log(c.name)
   die("func not defined");
  }
  @return midNewx(func, args)
@@ -64,5 +67,5 @@ undx ->(ast JsonArr, cl Classx)Midx{
   log(ast)
   die("ast error, not defined "+ id)
  }
- @return callClassMemx(DicCptx(f.obj)["und"], [ast]Cpt, cl)
+ @return callClassMemx(Objx(f.obj).dic["und"], [ast]Cpt, cl)
 }

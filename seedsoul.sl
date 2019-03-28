@@ -1,20 +1,20 @@
 @load "seedbnf"
-
+//self: main rebear 
 soulns := classNsNewx("soul", bnfns);
 nsx(soulns, soulns)
 
 soulc := classxNewx("Soul", soulns)
 selfc := classxNewx("Self", soulns, soulc)
-monitorc := classxNewx("Monitor", soulns)
+envc := classxNewx("Env", soulns, soulc)//TODO static mem.heap
 
 
-rebearf := funcNewx("rebear", soulns, ->(arr ArrCptx)Cpt{
- log("rebear")
-})
+bearf := funcNewx("bear", soulns, ->(arr ArrCptx)Cpt{
+ log("bear")
+}, envc)
 
 
 
-selfStartf := funcNewx("start", soulns, ->(arr ArrCptx)Cpt{
+selfMainf := funcNewx("main", soulns, ->(arr ArrCptx)Cpt{
  #osargs = @soul.getCmdArgs()
  @if(osargs.len() == 1){
   log("./soul3 [FILE] [EXECFLAG] [DEFFLAG]")
@@ -28,13 +28,14 @@ selfStartf := funcNewx("start", soulns, ->(arr ArrCptx)Cpt{
   execx(mid, global)
  }
 }, selfc)
-monitorStartf := funcNewx("start", soulns,  ->(arr ArrCptx)Cpt{
- callx(selfStartf.obj)
-}, monitorc)
+envMainf := funcNewx("main", soulns,  ->(arr ArrCptx)Cpt{
+ callx(selfMainf.obj)
+}, envc)
 
 mainf := funcNewx("main", soulns, ->(arr ArrCptx)Cpt{
- callx(monitorStartf.obj)
-})
+ //init env
+ callx(bearf.obj, [arr[0]])
+}, envc)
 
 
 
@@ -46,4 +47,10 @@ recx ->(str Str)JsonArr{
  }
 // log(ast)
  @return ast
+}
+
+soulNewx ->(envns Classx)Objx{
+ @return objNewx(envc, {
+  mem: memNewx(classMemNewx(envns))
+ }Cpt)
 }

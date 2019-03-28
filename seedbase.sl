@@ -7,12 +7,13 @@ ArrCptx := @type Arr Cpt
 DicCptx := @type Dic Cpt
 ArrClassx := @type Arr Classx
 DicClassx := @type Dic Classx
+ArrStrx := @type Arr Str
 Classx =>{
  type: T
  name: Str
  prt: Classx
  alt: Classx 
- 
+
  dic: DicClassx
  id: Uint
  
@@ -21,8 +22,13 @@ Classx =>{
  
  obj: Cpt
  path: Str
+
+ imp: ArrStrx
 }
-ArrStrx := @type Arr Str
+Objx =>{
+ class: Classx
+ dic: DicCptx 
+}
 Intx := @type Int
 Floatx := @type Float
 Strx := @type Str
@@ -137,11 +143,20 @@ classNsNewx ->(name Str, prt Classx, alt Classx)Classx{
  x.obj = name;
  @return x;
 }
+objNewx ->(class Classx, dic DicCptx)Objx{
+ @if(!dic){
+  dic = &DicCptx
+ }
+ @return &Objx{
+  class: class
+  dic: dic  
+ }
+}
 objxNewx ->(name Str, ns Classx, class Classx, dic DicCptx)Classx{
  #x = classNewx(class.name + "_"+name);
  x.type = T##OBJ
  x.class = class;
- x.obj = dic;
+ x.obj = objNewx(class, dic);
  nsx(x, ns)
  @return x;
 }
@@ -169,6 +184,7 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
    }
   }
  }
+ //TODO if prt and alt return different result: die error
  @if(cl.alt){
   #v = cl.alt
   #k = Str(v.id);
@@ -200,4 +216,7 @@ cinx ->(cl Classx, tar Classx)Bool{
  }
  @return @false
  //TODO cache
+}
+
+dbGetx ->(){
 }

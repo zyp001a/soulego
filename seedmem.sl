@@ -1,6 +1,7 @@
 @load "seedfunc"
 FuncMemx ->(ArrCptx, Memx)Cpt
 FuncClassMemx ->(ArrCptx, Classx)Cpt
+//TODO mem split to stack and heap
 Memx =>{
  prt: Memx
  arr: ArrCptx
@@ -12,6 +13,9 @@ Memx =>{
 
 memns := classNsNewx("mem", funcns);
 nsx(memns, memns)
+
+memc := classxNewx("Mem", memns)
+memc.type = T##MEM
 
 classMemc := classxNewx("ClassMem", memns, classc);
 classMemc.type = T##CLASSMEM

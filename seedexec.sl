@@ -3,6 +3,8 @@
 execns := classNsNewx("soul", midns);
 nsx(execns, execns)
 
+execc := classxNewx("Exec", execns)//need main mem(stack+ heap)
+
 valf := funcMemNewx("val", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
 }, valc, dymc, [classc])

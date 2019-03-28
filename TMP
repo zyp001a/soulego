@@ -1,0 +1,40 @@
+
+classmem
+mem
+
+classns
+ns
+
+prog
+ stdin
+ stdout
+ stderr
+ main
+
+framework
+Framework_soulimp
+Framework_golang
+@return prog
+
+env
+ ns
+ bootstrap
+  prog = Framework_golang imp (Framework_soulimp imp this)
+	prog.main()  
+ bear 
+  assign newsoul (new Soul)
+  prog = Framework_golang imp (Framework_soulimp imp soul)
+	prog.main()
+Prog_Env
+ main
+  
+  
+soul 
+ nss
+ set ns key cpt
+Prog_Soul
+ main
+  wait in
+	log history
+
+

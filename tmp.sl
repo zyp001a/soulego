@@ -19,7 +19,7 @@ dbGetx ->(ns Classx, key Str)Classx{
   str = "@`"+@fs[fstr+"t"]+"` '"+fstr+"t'";
   @if(f2["timeMod"] > f2cache["timeMod"]){
    Str#jstr = osCmd(osEnvGet("HOME")+"/soul2/sl-reader", key + " := "+str)
-   @fs[fstr + "t.cache"] = jstr   
+   @fs[fstr + "t.cache"] = jstr
   }@else{
    Str#jstr = @fs[fstr + "t.cache"]  
   }
@@ -32,6 +32,6 @@ dbGetx ->(ns Classx, key Str)Classx{
   log(fstr)
   die("dbGetx: wrong grammar")
  }
- Cptx#r = ast2cptx(ast, scope, classNewx())
+ Cpt#r = ast2cptx(ast, scope, classNewx())
  @return r
 }

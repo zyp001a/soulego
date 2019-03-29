@@ -81,7 +81,7 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
   log(c.name)
   die("func not defined");
  }
- @return midNewx(func, args)
+ @return midNewx(callf, [func, args]Cpt)
 })
 
 bnfUndNewx ->(name Str, func FuncClassMemx)Classx{

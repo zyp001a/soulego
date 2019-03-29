@@ -3,7 +3,7 @@
 dbns := classNsNewx("db", bnfns);
 nsx(dbns, dbns)
 
-dbx["val"] = ->(ns Classx, key Str)Classx{
+dbGetx ->(ns Classx, key Str)Str{
  #fstr = osEnvGet("HOME")+"/soulx/db/" + Str(ns.obj) + "/" + key + ".sl" 
  #f = @fs.stat(fstr)
 // #f2 = @fs.stat(fstr+"t")
@@ -17,6 +17,9 @@ dbx["val"] = ->(ns Classx, key Str)Classx{
    Str#jstr = @fs[fstr + ".cache"]
   }
  }
+}
+dbx["val"] = ->(ns Classx, key Str)Classx{
+ #jstr = dbGetx(ns, key)
  @if(jstr){
   #ast = JsonArr(jstr)
   @if(ast.len() == 0){

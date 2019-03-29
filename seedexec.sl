@@ -19,7 +19,13 @@ idf := funcMemNewx("id", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
 }, valc, dymc, [classc, strc])
 callf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
- log("call")
+ #func = Classx(arr[0])
+ #args = ArrCptx(arr[1])
+ #argsn = &ArrCptx
+ @each _ v args{
+  argsn.push(execx(v, mem))
+ }
+ @return execx(midNewx(func, argsn), mem)
 }, anyc)//funcc
 callmidf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
  log("callmid")
@@ -31,4 +37,10 @@ execx ->(mid Midx, mem Memx)Cpt{
  }@elif(mid.func.type == T##FUNCMEM){
   @return callMemx(mid.func.obj, mid.args, mem) 
  } 
+}
+rexecx ->(class Classx, obj Cpt)Midx{
+ @if(inx(class, objc)){
+  
+ }
+ @return midNewx(valf, ["1"]Cpt)
 }

@@ -4,15 +4,13 @@ test? loader?
 
 abc -> func
 abcAbc -> func alt
-abc_abc -> func multiple step
 
 Abc -> class
 AbcAbc -> parent
 Abc_Abc -> consist
 Abc__Abc_Abc -> param class
 
-Abc_abc -> instance with name
-Abc_abc_bcd -> instance split into two instance
+Abc(_Abc)*_abc* -> instance with name
 Abc__user_abc/1233 -> instance created by user with number/name
 
 

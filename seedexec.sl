@@ -14,8 +14,10 @@ paragraphf := funcMemNewx("paragraph", execns, ->(arr ArrCptx, mem Memx)Cpt{
   @if(r){
   }
  }
-}, midc)
-
+})
+idf := funcMemNewx("id", execns, ->(arr ArrCptx, mem Memx)Cpt{
+ @return arr[0]
+}, valc, dymc, [classc, strc])
 
 execx ->(mid Midx, mem Memx)Cpt{
  @if(mid.func.type == T##FUNC){

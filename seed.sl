@@ -1,5 +1,3 @@
-@load "seedimp"
-
-#envo = envNewx(soulns)
-callx(mainf.obj, [soulo]Cpt);
+@load "seedsoul"
+callx(mainf.obj, [soulSelfo]Cpt);
 

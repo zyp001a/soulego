@@ -10,12 +10,14 @@ ID    [a-zA-Z_][a-zA-Z_0-9]*
 
 void count();
 void comment();
+void comment2();
 void unput_if();
 int check_type();
 %}
 
 %%
 "/*"			{ comment(); }
+"//"			{ comment2(); }
 
 {ID}		{ count(); yylval = initstr(yytext); return(check_type()); }
 
@@ -43,14 +45,18 @@ int yywrap()
 	return(1);
 }
 
-
+void comment2(){
+  char c;
+	while ((c = input()) != '\n' && c != 0){}
+//    putchar(c);
+}
 void comment()
 {
 	char c, c1;
 
 loop:
-	while ((c = input()) != '*' && c != 0)
-		putchar(c);
+	while ((c = input()) != '*' && c != 0){}
+//		putchar(c);
 
 	if ((c1 = input()) != '/' && c != 0)
 	{
@@ -58,8 +64,8 @@ loop:
 		goto loop;
 	}
 
-	if (c != 0)
-		putchar(c1);
+//	if (c != 0)
+//		putchar(c1);
 }
 
 int row = 1;//the line number (end of grammar)

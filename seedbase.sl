@@ -165,6 +165,8 @@ classxNewx ->(name Str, ns Classx, prt Classx, alt Classx, dic DicClassx)Classx{
  nsx(x, ns);
  @return x;
 }
+DBX ->(Classx, Str)Classx
+dbx := {}DBX
 cgetx ->(cl Classx, key Str, cache Dic)Classx{
  #r = cl.dic[key]
  @if(r != _){
@@ -172,6 +174,12 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
  }
  @if(cl.class.type == T##CLASSNS){
   //DBGET
+  @if(dbx["val"]){
+   #rr = call(dbx["val"], [cl, key])
+   @if(rr){
+    @return rr
+   }
+  }
  }
  @if(cl.prt){
   #v = cl.prt;
@@ -218,5 +226,3 @@ cinx ->(cl Classx, tar Classx)Bool{
  //TODO cache
 }
 
-dbGetx ->(){
-}

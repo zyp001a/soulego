@@ -1,1 +1,1 @@
-cat test.sl | ./parser
+cat bootstrap.sl | ./parser

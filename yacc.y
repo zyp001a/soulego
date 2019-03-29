@@ -80,10 +80,6 @@ words
 	$$ = $1;
 	addnode($$, $2);
 }
-| '(' words ')'
-{
-	$$ = $2;
-}
 ;
 
 word
@@ -111,6 +107,10 @@ word
 {
 	$$ = $1;
 }
+| '(' words ')'
+{
+	$$ = $2;
+}
 ;
 
 block
@@ -118,7 +118,7 @@ block
 {
 	$$ = initnode("paragraph");	
 }
-| '{' block '}'
+| '{' paragraph '}'
 {
 	$$ = $2;	
 }

@@ -1,3 +1,3 @@
-assign _env (_bootstrap (new Prog_this))
-assign _this (bear _env)//run shell
-main _this//run shell 2
+call imp Imp_metasoul Env_Prog_self//imp env
+//assign _this (bear _env)//run env bear, imp self
+//main _this//run self

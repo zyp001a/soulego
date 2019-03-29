@@ -1,6 +1,6 @@
 @load "seedfunc"
 FuncMemx ->(ArrCptx, Memx)Cpt
-FuncClassMemx ->(ArrCptx, Classx)Cpt
+FuncClassMemx ->(ArrCptx, Classx)Cpt//TODO (Ast, Classx)Mid
 //TODO mem split to stack and heap
 Memx =>{
  prt: Memx

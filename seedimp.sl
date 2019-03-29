@@ -4,9 +4,9 @@ impns := classNsNewx("imp", progns);
 nsx(impns, impns)
 
 classImpc := classxNewx("ClassImp", impns, classc);
+impMetac := classObjNewx("meta", impns, classImpc);
 
 
-impMetac := classObjNewx("meta", impns, classImpc)
 
 funcMemNewx("imp", impns, ->(arr ArrCptx, mem Memx)Cpt{
  log(arr)

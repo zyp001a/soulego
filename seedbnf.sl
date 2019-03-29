@@ -4,7 +4,9 @@ bnfns := classNsNewx("bnf", execns);
 nsx(bnfns, bnfns)
 
 
-bnfc := classxNewx("Bnf", bnfns, objc);
+
+classBnfc := classxNewx("ClassBnf", bnfns, classc);
+bnfBasec := classObjNewx("base", bnfns, classBnfc)
 
 jsonArrc := classxNewx("JsonArr", bnfns, valc);
 
@@ -38,7 +40,7 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
 })
 bnfUndNewx("words", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
- #nsfunc = cgetx(cl.ns, "Bnf_"+ast[1], {})
+ #nsfunc = cgetx(cl.ns, "ClassBnf_base_"+ast[1], {})//TODO
  @if(!nsfunc){
   die("und func not defined " + ast[1]);
  }
@@ -87,7 +89,7 @@ bnfUndNewx ->(name Str, func FuncClassMemx)Classx{
   und: func
   //bnf/rec
  }Cpt
- #oc = objxNewx(name, bnfns, bnfc, o)
+ #oc = objxNewx(name, bnfns, bnfBasec, o)
  @return oc
 }
 
@@ -100,7 +102,7 @@ undNewx ->(ns Classx)Objx{
 
 undx ->(ast JsonArr, cl Classx)Midx{
  #id = Str(ast[0])
- #f = cgetx(cl.ns, "Bnf_"+id, {});
+ #f = cgetx(cl.ns, "ClassBnf_base_"+id, {});//TODO other prefix
  @if(!f){
   log(ast)
   die("ast error, not defined "+ id)

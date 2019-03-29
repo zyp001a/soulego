@@ -4,7 +4,6 @@ bnfns := classNsNewx("bnf", execns);
 nsx(bnfns, bnfns)
 
 
-
 bnfc := classxNewx("Bnf", bnfns, objc);
 
 jsonArrc := classxNewx("JsonArr", bnfns, valc);
@@ -35,7 +34,7 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  @if(!r){
   r = cgetx(cl.ns, ast[1], {})
  }
- @return r;
+ @return midNewx(idf, [r]Cpt);
 })
 bnfUndNewx("words", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
@@ -51,14 +50,14 @@ bnfUndNewx("var", ->(arr ArrCptx, cl Classx)Cpt{
 bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
  log(arr)
- @return midNewx(valf, [12]Cpt)
+
  #midfunc = undx(ast[2], cl)
  @if(midfunc.func != idf){
-  @return 
+  @return midNewx(callmidf)
  }
  #nsfunc = Classx(midfunc.args[0])
  @if(!nsfunc){
-  log(ast[2])
+  log(ast[2])  
   die("not function")
  }
  #args = &ArrCptx
@@ -73,8 +72,9 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  }@else{
   #c = typepredx(args[0]);
  }
- #func = cgetx(nsfunc, c.name);
+ #func = cgetx(nsfunc, c.name, {});//TODO rget
  @if(!func){
+  log(nsfunc)
   log(nsfunc.name)   
   log(c.name)
   die("func not defined");

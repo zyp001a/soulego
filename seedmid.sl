@@ -23,4 +23,5 @@ midNewx ->(func Classx, args ArrCptx, ln Uint)Midx{
  @return x
 }
 typepredx ->(mid Midx)Classx{
+ @return anyc
 }

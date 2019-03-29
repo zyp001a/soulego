@@ -1,4 +1,4 @@
-T := @enum CLASS CLASSMEM CLASSNS\
+T := @enum CLASS CLASSNS\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  FUNC FUNCMEM FUNCCLASSMEM\
  MID MEM DYM\
@@ -141,6 +141,14 @@ classNsNewx ->(name Str, prt Classx, alt Classx)Classx{
  x.type = T##CLASSNS
  x.class = classNsc;
  x.obj = name;
+ @return x;
+}
+classObjNewx ->(name Str, ns Classx, class Classx, prt Classx, alt Classx)Classx{
+ #x = classNewx(class.name+"_"+name, prt, alt);
+ x.type = T##CLASS
+ x.class = class;
+ x.obj = name;
+ nsx(x, ns)
  @return x;
 }
 objNewx ->(class Classx, dic DicCptx)Objx{

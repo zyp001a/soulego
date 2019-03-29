@@ -16,16 +16,17 @@ classNsFuncNewx ->(key Str, sp Classx)Classx{
  x.obj = Str(sp.obj) + "/" + key;
  @return x
 }
-funcNewx ->(key Str, sp Classx, val Funcx, m Classx, return Classx, argtypes ArrClassx)Classx{
+funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrClassx, fc Classx)Classx{
  //get func class from argtypes and return
  #x = cgetx(sp, key, {})
  @if(!x){
   #x = classNsFuncNewx(key, sp)
  }
-
- #fc = funcc;
  @if(!m){
   m = voidc
+ }
+ @if(!fc){
+  fc = funcc;
  }
  y = classNewx(m.name, fc)
  nsx(y, x)

@@ -18,6 +18,12 @@ paragraphf := funcMemNewx("paragraph", execns, ->(arr ArrCptx, mem Memx)Cpt{
 idf := funcMemNewx("id", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
 }, valc, dymc, [classc, strc])
+callf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
+ log("call")
+}, anyc)//funcc
+callmidf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
+ log("callmid")
+}, midc)
 
 execx ->(mid Midx, mem Memx)Cpt{
  @if(mid.func.type == T##FUNC){

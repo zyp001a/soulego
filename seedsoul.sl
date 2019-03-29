@@ -3,7 +3,7 @@
 soulns := classNsNewx("soul", envns);
 nsx(soulns, soulns)
 
-soulc := classxNewx("Soul", soulns, undc, impc)
+soulc := classxNewx("Soul", soulns)//, undc, impc)
 
 sbotc := classxNewx("Sbot", soulns, progc, soulc)
 

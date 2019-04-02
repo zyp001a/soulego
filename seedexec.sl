@@ -1,6 +1,6 @@
 @load "seedmid"
 
-execns := classNsNewx("soul", midns);
+execns := classNsNewx("exec", midns);
 nsx(execns, execns)
 
 execc := classxNewx("Exec", execns)//need main mem(stack+ heap)
@@ -39,7 +39,7 @@ execx ->(mid Midx, mem Memx)Cpt{
  } 
 }
 rexecx ->(class Classx, obj Cpt)Midx{
- @if(inx(class, objc)){
+ @if(cinx(class, objc)){
   
  }
  @return midNewx(valf, ["1"]Cpt)

@@ -1,0 +1,23 @@
+base + db hook
+func
+view
+mem
+mid
+exec
+bnf = bnf + ast + und  (str->mid->cpt)
+ db
+prog
+imp (entity -> ...)
+lang translate TODO
+env
+soul
+
+Ext
+ 
+Shell = 
+ imp
+
+
+Prog
+Proj
+ 

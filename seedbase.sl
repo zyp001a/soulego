@@ -23,7 +23,6 @@ Classx =>{
  obj: Cpt
  path: Str
 
- imp: ArrStrx
 }
 Objx =>{
  class: Classx

@@ -1,4 +1,4 @@
-@load "seedfunc"
+@load "seedview"
 FuncMemx ->(ArrCptx, Memx)Cpt
 FuncClassMemx ->(ArrCptx, Classx)Cpt//TODO (Ast, Classx)Mid
 //TODO mem split to stack and heap
@@ -11,7 +11,7 @@ Memx =>{
  id: Uint
 }
 
-memns := classNsNewx("mem", funcns);
+memns := classNsNewx("mem", viewns);
 nsx(memns, memns)
 
 memc := classxNewx("Mem", memns)

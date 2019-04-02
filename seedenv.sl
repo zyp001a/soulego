@@ -5,8 +5,6 @@ nsx(envns, envns)
 
 envc := classxNewx("Env", envns)//TODO static mem.heap
 
-envprogc := classxNewx("Env_Prog", envns, envc, progc)
-
 bearf := funcNewx("bear", envns, ->(arr ArrCptx)Cpt{
  // assign newsoul (new Soul)
  // prog = Framework_golang imp (Framework_soulimp imp soul)
@@ -20,10 +18,6 @@ funcNewx("bootstrap", envns, , ->(arr ArrCptx)Cpt{
 //  prog.main()
  log("bootstrap")
 }, envc)
-
-funcNewx("main", envns, , ->(arr ArrCptx)Cpt{
- log("main")
-}, envprogc)
 
 envNewx ->(ns Classx)Objx{
  @return objNewx(envprogc, {  

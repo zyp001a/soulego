@@ -3,6 +3,6 @@
 progns := classNsNewx("env", dbns);
 nsx(progns, progns)
 
-progc := classxNewx("Prog", progns, objc);
+progc := classxNewx("Prog", progns, lifec);
 
-projc := classxNewx("Proj", progns, progc);
+

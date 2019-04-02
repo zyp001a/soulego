@@ -4,7 +4,7 @@ dbns := classNsNewx("db", bnfns);
 nsx(dbns, dbns)
 
 dbGetx ->(ns Classx, key Str)Str{
- #fstr = osEnvGet("HOME")+"/soulx/db/" + Str(ns.obj) + "/" + key + ".sl" 
+ #fstr = osEnvGet("HOME")+"/soulego/db/" + Str(ns.obj) + "/" + key + ".sl" 
  #f = @fs.stat(fstr)
 // #f2 = @fs.stat(fstr+"t")
  #fcache = @fs.stat(fstr+".cache")
@@ -23,7 +23,7 @@ dbx["val"] = ->(ns Classx, key Str)Classx{
  @if(jstr){
   #ast = JsonArr(jstr)
   @if(ast.len() == 0){
-   log(fstr)
+   log(jstr)
    die("dbGetx: wrong grammar")
   }
   @return inx(ast, undNewx(ns));

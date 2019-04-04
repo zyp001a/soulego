@@ -1,5 +1,20 @@
 It is not a program, it is a creature.
-base db.. func mem mid exec bnf soul imp;
+
+base + db hook
+func
+view
+mem
+mid
+exec
+bnf = bnf + ast + und  (str->mid->cpt)
+ db
+prog
+agent
+imp (entity -> ...)
+lang translate TODO
+env
+soul
+
 test? loader?
 
 abc -> func

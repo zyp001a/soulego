@@ -179,6 +179,9 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
  @if(r != _){
   @return r
  }
+ @if(!cache){
+  cache = &Dic
+ }
  @if(cl.class.type == T##CLASSNS){
   //DBGET
   @if(dbx["val"]){

@@ -8,21 +8,12 @@
    ["func", ""]
  ]
 */
-Ast* initnode(char *str)
+Ast* init(char *str, int ln)
 {
 	Ast* p = (Ast*)malloc(sizeof(Ast));
 	memset (p, 0, sizeof(Ast));
 	p->str = str;
-	p->type = TNODE;
-	return p;
-}
-Ast* initstrstat(char *str)
-{
-	Ast* p = (Ast*)malloc(sizeof(Ast));
-	memset (p, 0, sizeof(Ast));
-	p->str = str;
-	p->len = 1;//is static
-	p->type = TSTR;
+	p->ln = ln;
 	return p;
 }
 Ast* initstr(char *str)
@@ -30,46 +21,27 @@ Ast* initstr(char *str)
 	Ast* p = (Ast*)malloc(sizeof(Ast));
 	memset (p, 0, sizeof(Ast));
 	p->str = strdup(str);
-	p->type = TSTR;
+	p->ln = -1;
 	return p;
-}
-Ast* initint(int i)
-{
-	Ast* p = (Ast*)malloc(sizeof(Ast));
-	memset (p, 0, sizeof(Ast));
-	p->len = i;
-	p->type = TINT;	
-	return p;
-}
-static Ast* nullnode;
-Ast* initnull()
-{
-	if(nullnode == NULL){
-		nullnode = (Ast*)malloc(sizeof(Ast));
-		memset (nullnode, 0, sizeof(Ast));
-		nullnode->type = TNULL;
-	}
-	return nullnode;
 }
 void print(Ast *ast)
 {
 	int i;
-	if(ast->type == TNODE){//is ast []
+	if(ast->ln != -1){//is ast []
 		putchar('[');				
-  	printf("\"%s\"", ast->str);
+  	printf("\"%s\",\"%d\"", ast->str, ast->ln);
 		for(i=0; i<ast->len; i++){
 			putchar(',');
 			print(ast->arr[i]);
 		}
 		putchar(']');
-	}else if(ast->type == TSTR){//is str
+	}else{
 		putchar('"');
   	fprintf(stdout, "%s", ast->str);
 		putchar('"');
-	}else{
-  	printf("\"%d\"", ast->len);				
 	}
 }
+/*
 void printpretty(Ast *ast, int ind)
 {
 	int i;
@@ -99,8 +71,12 @@ void printpretty(Ast *ast, int ind)
   	printf("\"%d\"", ast->len);				
 	}
 }
-void addnode(Ast *ast, Ast *subast)
+*/
+void add(Ast *ast, Ast *subast)
 {
+	if(subast == NULL){
+		return;
+	}
 	if(ast->len == 0){
 		ast->arr = (Ast**)malloc(sizeof(Ast*));
 	}else{
@@ -109,14 +85,3 @@ void addnode(Ast *ast, Ast *subast)
 	ast->arr[ast->len] = subast;
 	ast->len ++;
 } 
-void addstr(Ast *ast, char* str)
-{
-	Ast *a = initstr(str);
-	addnode(ast, a);
-}
-void addint(Ast *ast, int i)
-{
-	Ast *a = initint(i);
-	addnode(ast, a);
-}
-

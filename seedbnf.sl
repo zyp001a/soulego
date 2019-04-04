@@ -17,42 +17,30 @@ undc := classxNewx("Und", bnfns);
 bnfUndNewx("paragraph", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
  #r = midNewx(paragraphf)
- @for(#i = 1; i < ast.len(); i++){
+ r.ln = Str(ast[1])
+ @for(#i = 2; i < ast.len(); i++){
   #e = ast[i]
   #mid = undx(e, cl)
   r.args.push(mid);
  }
  @return r
 })
-bnfUndNewx("sentence", ->(arr ArrCptx, cl Classx)Cpt{
- #ast = JsonArr(arr[0])
- #r = undx(ast[1], cl)
- r.ln = Str(ast[2])
- @return r;
-})
 bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
- #r = cgetx(cl, ast[1], {})
- @if(!r){
-  r = cgetx(cl.ns, ast[1], {})
+ #key = ast[2]
+ #r = cgetx(cl, key, {})
+ @if(r){
+  @return midNewx(idf, [r, cl]Cpt); 
  }
- @return midNewx(idf, [r]Cpt);
-})
-bnfUndNewx("words", ->(arr ArrCptx, cl Classx)Cpt{
- #ast = JsonArr(arr[0])
- #nsfunc = cgetx(cl.ns, "ClassBnf_base_"+ast[1], {})//TODO
- @if(!nsfunc){
-  die("und func not defined " + ast[1]);
+ r = cgetx(cl.ns, key, {}) 
+ @if(r){
+  @return midNewx(idf, [r, cl.ns]Cpt); 
  }
- @return callClassMemx(Objx(nsfunc.obj).dic["und"], [ast]Cpt, cl) 
+ die("id not defined "+ast[2])
 })
-bnfUndNewx("var", ->(arr ArrCptx, cl Classx)Cpt{
- @return midNewx(valf, [11]Cpt) 
-})
+
 bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
- log(arr)
-
  #midfunc = undx(ast[2], cl)
  @if(midfunc.func != idf){
   @return midNewx(callmidf)
@@ -82,6 +70,9 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
   die("func not defined");
  }
  @return midNewx(callf, [func, args]Cpt)
+})
+bnfUndNewx("var", ->(arr ArrCptx, cl Classx)Cpt{
+ @return midNewx(valf, [11]Cpt) 
 })
 
 bnfUndNewx ->(name Str, func FuncClassMemx)Classx{

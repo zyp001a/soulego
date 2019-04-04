@@ -18,7 +18,7 @@ midNewx ->(func Classx, args ArrCptx, ln Uint)Midx{
   ln: ln
  }
  @if(args == _){
-  x.args =  &ArrCptx
+  x.args = &ArrCptx
  }
  @return x
 }

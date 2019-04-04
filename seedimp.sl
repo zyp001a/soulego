@@ -1,19 +1,16 @@
-@load "seedprog"
+@load "seedagent"
 
-impns := classNsNewx("imp", progns);
+impns := classNsNewx("imp", agentns);
 nsx(impns, impns)
 
-impBase := 
-
 funcMemNewx("imp", impns, ->(arr ArrCptx, mem Memx)Cpt{
- #imp = Classx(arr[0])
- #tar = Classx(arr[1]) 
- #r = impx(imp, tar, mem)
+ #tar = Classx(arr[0])
+ #r = impx(tar)
+ log(tar)
  log(r)
-}, classImpc, midc, [classc])//nsc use any for convenience
+}, anyc, midc)//nsc use any for convenience
 
-impx ->(imp Classx, cla Classx, mem Memx)Midx{
+impx ->(cla Classx)Midx{
  #r = midNewx(paragraphf) 
-
- @return callMemx(Objx(f.obj).dic["imp"], [obj]Cpt, mem)
+ @return r
 }

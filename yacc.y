@@ -42,66 +42,60 @@ start
 paragraph
 : sentence
 {
-	$$ = initnode("paragraph");
-	if($1->type != TNULL){
-		addnode($$, $1);
-	}
+	$$ = init("paragraph", row);
+	add($$, $1);
 }
 | paragraph sentence
 {
 	$$ = $1;
-	if($2->type != TNULL){
-		addnode($$, $2);
-	}
+	add($$, $2);
 }
 ;
 
 sentence
 : words ED
 {
-	$$ = initnode("sentence");
-	addnode($$, $1);
-	addint($$, row);	
+	$$ = $1;
 }
 | ED
 {
-	$$ = initnull();
+	$$ = NULL;
 }
 ;
 
 words
-: ID 
+: ID
 {
-	$$ = initnode("words");	
-	addnode($$, $1);
+	$$ = init($1->str, row);
+	free($1);
 }
 | words word
 {
 	$$ = $1;
-	addnode($$, $2);
+	add($$, $2);
 }
 ;
 
 word
 : INT 
 {
-	$$ = initnode("int");
-	addnode($$, $1);
+	$$ = init("int", row);
+	add($$, $1);
 }
 | FLOAT
 {
-	$$ = initnode("int");
-	addnode($$, $1);
+	$$ = init("float", row);
+	add($$, $1);
 }
 | STR
 {
-	$$ = initnode("str");
-	addnode($$, $1);
+	$$ = init("str", row);
+	add($$, $1);
 }
 | ID
 {
-	$$ = initnode("id");
-	addnode($$, $1);	
+	$$ = init("id", row);
+	add($$, $1);
 }
 | block
 {
@@ -116,7 +110,7 @@ word
 block
 : '{' '}'
 {
-	$$ = initnode("paragraph");	
+	$$ = init("paragraph", row);	
 }
 | '{' paragraph '}'
 {

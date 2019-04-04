@@ -24,17 +24,20 @@ funcMemc.type = T##FUNCMEM
 funcClassMemc := classxNewx("FuncClassMem", memns, funcc);
 funcClassMemc.type = T##FUNCCLASSMEM
 
-
 funcMemNewx ->(key Str, sp Classx, val FuncMemx, m Classx, return Classx, argtypes ArrClassx)Classx{
  @return funcNewx(key, sp, val, m, return, argtypes, funcMemc)
 }
 funcClassMemNewx ->(key Str, sp Classx, val FuncClassMemx)Classx{
  @return funcNewx(key, sp, val, _, _, _, funcMemc)
 }
-classMemNewx ->(ns Classx, prt Classx)Classx{
+classMemNewx ->(ns Classx, prt Classx, arr ArrClassx)Classx{
  #name = "Mem_"+Str(uidx());
  #x = classNewx(name, prt);
  x.class = classMemc;
+ @if(!arr){
+  arr = &ArrClassx
+ }
+ x.obj = arr;
  nsx(x, ns);
  @return x;
 }

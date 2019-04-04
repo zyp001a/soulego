@@ -4,7 +4,7 @@ Midx =>{
  args: ArrCptx
  ln: Uint
 }
-
+ArrMidx := @type Arr Midx
 midns := classNsNewx("mid", memns);
 nsx(midns, midns)
 

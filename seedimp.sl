@@ -6,11 +6,11 @@ nsx(impns, impns)
 funcMemNewx("imp", impns, ->(arr ArrCptx, mem Memx)Cpt{
  #tar = Classx(arr[0])
  #r = impx(tar)
- log(tar)
- log(r)
-}, anyc, midc)//nsc use any for convenience
+ @return r
+}, anyc, midc)//Prog class -> mid
 
 impx ->(cla Classx)Midx{
- #r = midNewx(paragraphf) 
+ #r = midNewx(paragraphf)
+ log("imp")
  @return r
 }

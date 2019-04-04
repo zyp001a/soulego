@@ -14,15 +14,27 @@ astc := classxNewx("Ast", bnfns, jsonArrc);
 
 undc := classxNewx("Und", bnfns);
 
+bnfUndNewx("func", ->(arr ArrCptx, cl Classx)Cpt{
+ #ast = JsonArr(arr[0])
+ #key = "Func_" + uidx();
+ #m = anyc;
+ #ret = anyc;  
+ #fc = funcBlockc;
+ #newcl = classMemNewx(cl.ns, cl);
+ #block = undx(ast[2], newcl)
+ #f = funcNewx(key, cl, block, m, ret, _, fc);
+ #r = midNewx(valf, [f]Cpt, Str(ast[1]))
+ @return r;
+})
 bnfUndNewx("paragraph", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
- #r = midNewx(paragraphf)
- r.ln = Str(ast[1])
+ #args = &ArrMidx;
  @for(#i = 2; i < ast.len(); i++){
   #e = ast[i]
   #mid = undx(e, cl)
-  r.args.push(mid);
+  args.push(mid);
  }
+ #r = midNewx(paragraphf, [cl, args]Cpt, Str(ast[1]))
  @return r
 })
 bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
@@ -42,14 +54,6 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
 bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
  #midfunc = undx(ast[2], cl)
- @if(midfunc.func != idf){
-  @return midNewx(callmidf)
- }
- #nsfunc = Classx(midfunc.args[0])
- @if(!nsfunc){
-  log(ast[2])  
-  die("not function")
- }
  #args = &ArrCptx
  @for(#i = 3; i < ast.len(); i++){
   #e = ast[i]
@@ -62,14 +66,25 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  }@else{
   #c = typepredx(args[0]);
  }
- #func = cgetx(nsfunc, c.name, {});//TODO rget
- @if(!func){
-  log(nsfunc)
-  log(nsfunc.name)   
-  log(c.name)
-  die("func not defined");
+
+ @if(midfunc.func != idf){
+  @return midNewx(callmidf, [midfunc, args]Cpt)
+ }@else{
+  #nsfunc = Classx(midfunc.args[0])
+  @if(!nsfunc){
+   log(ast[2])  
+   die("not function")
+  }
+
+  #func = cgetx(nsfunc, c.name, {});//TODO rget
+  @if(!func){
+   log(nsfunc)
+   log(nsfunc.name)   
+   log(c.name)
+   die("func not defined");
+  }
+  @return midNewx(callf, [func, args]Cpt)  
  }
- @return midNewx(callf, [func, args]Cpt)
 })
 bnfUndNewx("var", ->(arr ArrCptx, cl Classx)Cpt{
  @return midNewx(valf, [11]Cpt) 

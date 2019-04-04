@@ -27,23 +27,31 @@ void yyerror(YYSTYPE* ret, const char *s)
 %token ED
 %token ID
 
-%token INT FLOAT STR
+%token INT FLOAT STR NULLX
 
 %start start
 %%
 
 start
-: paragraph
+: sentence
 {
-	*ret = $$;
+	*ret = $1;
 }
 ;
 
+end
+: ED
+| end ED
+;
 paragraph
 : sentence
 {
 	$$ = init("paragraph", row);
 	add($$, $1);
+}
+| end
+{
+	$$ = init("paragraph", row);
 }
 | paragraph sentence
 {
@@ -53,13 +61,9 @@ paragraph
 ;
 
 sentence
-: words ED
+: words end
 {
 	$$ = $1;
-}
-| ED
-{
-	$$ = NULL;
 }
 ;
 
@@ -97,22 +101,22 @@ word
 	$$ = init("id", row);
 	add($$, $1);
 }
+| NULLX
+{
+	$$ = init("null", row);
+}
 | block
 {
 	$$ = $1;
 }
-| '(' words ')'
+| '(' sentence ')'
 {
 	$$ = $2;
 }
 ;
 
 block
-: '{' '}'
-{
-	$$ = init("paragraph", row);	
-}
-| '{' paragraph '}'
+: '{' paragraph '}'
 {
 	$$ = $2;	
 }

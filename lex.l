@@ -12,6 +12,7 @@ void count();
 void comment();
 void comment2();
 void unput_if();
+int add_ed();
 int check_type();
 %}
 
@@ -19,7 +20,7 @@ int check_type();
 "/*"			{ comment(); }
 "//"			{ comment2(); }
 
-{ID}		{ count(); yylval = initstr(yytext); return(check_type()); }
+{ID}		{ count(); return(check_type()); }
 
 {D}+{ID}?		{ count(); yylval = initstr(yytext); return(INT); }
 {D}*"."{D}+{ID}?	{ count(); yylval = initstr(yytext); return(FLOAT); }
@@ -30,9 +31,9 @@ int check_type();
 [;,\n\r]  { count(); return(ED); }
 
 "{"		{ count(); return('{'); }
-"}"		{ count(); return('}'); }
+"}"		{ return(add_ed('}')); }
 "("		{ count(); return('('); }
-")"		{ count(); return(')'); }
+")"		{ return(add_ed(')')); }
 
 [ \t\v\f]		{ count(); }
 <<EOF>>  {  static int once = 0; return once++ ? 0 : ED; }
@@ -100,14 +101,25 @@ void count()
 //	ECHO;
 }
 
+int add_edc = 0;
+int add_ed(int ret){
+  if(add_edc){
+    add_edc = 0;
+    count();
+    return ret;
+  }else {
+    add_edc = 1;
+    unput((char)ret);
+    return ED;
+  }
+}
+
 void unput_if(){
 	nocount_flag = 1;
 	unput('f');
 	unput('i');
 	unput('@');
 }
-int check_type()
-{
 /*
 * pseudo code --- this is what it should check
 *
@@ -116,10 +128,11 @@ int check_type()
 *
 *	return(ID);
 */
-
-/*
-*	it actually will only return IDENTIFIER
-*/
-
+int check_type()
+{
+  if(yytext[0] == '_' && yyleng == 1){
+    return(NULLX);
+  }
+  yylval = initstr(yytext);
 	return(ID);
 }

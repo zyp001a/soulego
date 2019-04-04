@@ -1,6 +1,6 @@
-T := @enum CLASS CLASSNS\
+T := @enum CLASS CLASSNS CLASSSET\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
- FUNC FUNCMEM FUNCCLASSMEM\
+ FUNC FUNCMEM FUNCCLASSMEM FUNCBLOCK\
  MID MEM DYM\
  ARRRAW DICRAW
 ArrCptx := @type Arr Cpt
@@ -22,7 +22,7 @@ Classx =>{
  
  obj: Cpt
  path: Str
-
+ cpath: Str
 }
 Objx =>{
  class: Classx
@@ -65,6 +65,9 @@ classc.class = classc
 classNsc := classNewx("ClassNs", classc);
 classNsc.type = T##CLASSNS
 
+classSetc := classNewx("ClassSet", classc);
+classNsc.type = T##CLASSSET
+
 basens := classNsNewx("base");
 nsx(basens, basens)
 
@@ -84,7 +87,6 @@ strc := classxNewx("Str", basens, valc);
 numc := classxNewx("Num", basens, valc);
 intc := classxNewx("Int", basens, numc);
 floatc := classxNewx("Float", basens, numc);
-
 
 
 uidx ->()Uint{

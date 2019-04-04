@@ -13,7 +13,7 @@ classNsFuncNewx ->(key Str, sp Classx)Classx{
  #x = classNewx(key);
  x.class = classNsFuncc;
  nsx(x, sp);
- x.obj = Str(sp.obj) + "/" + key;
+ x.cpath = sp.cpath + "/" + key;
  @return x
 }
 funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrClassx, fc Classx)Classx{
@@ -28,7 +28,12 @@ funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrCl
  @if(!fc){
   fc = funcc;
  }
- y = classNewx(m.name, fc)
+ @if(!return){
+  return = voidc
+ }
+ y = classNewx(m.name, fc, _, {
+  return: return
+ })
  nsx(y, x)
  y.obj = val;    
  @return y

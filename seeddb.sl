@@ -4,7 +4,7 @@ dbns := classNsNewx("db", bnfns);
 nsx(dbns, dbns)
 
 dbGetx ->(ns Classx, key Str)Str{
- #fstr = osEnvGet("HOME")+"/soulego/db/" + Str(ns.obj) + "/" + key + ".sl" 
+ #fstr = osEnvGet("HOME")+"/soulego/db/" + ns.cpath + "/" + key + ".sl" 
  #f = @fs.stat(fstr)
 // #f2 = @fs.stat(fstr+"t")
  #fcache = @fs.stat(fstr+".cache")

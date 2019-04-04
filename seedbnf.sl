@@ -51,6 +51,18 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  die("id not defined "+ast[2])
 })
 
+bnfUndNewx("get", ->(arr ArrCptx, cl Classx)Cpt{
+ #ast = JsonArr(arr[0]) 
+ #clmid = undx(ast[2], cl)
+ #key = JsonArr(ast[2])[2]
+ @if(clmid.func.id == valf.id){
+  #cl = Classx(clmid.args[0])
+  @return cgetx(cl, key);
+ }
+})
+bnfUndNewx("set", ->(arr ArrCptx, cl Classx)Cpt{
+ 
+})
 bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
  #midfunc = undx(ast[2], cl)

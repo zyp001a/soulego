@@ -6,10 +6,12 @@ typedef struct _Ast
 	struct _Ast** arr;
 	int len;
 	int ln; //ln = -1: string
+	void* info;
 } Ast;
 #define YYSTYPE Ast*
 Ast* init(char *str, int ln);
 Ast* initstr(char *str);
+Ast* initstr2(char *str, char q);
 void print(Ast *ast);
 void add(Ast *ast, Ast *subast);
 

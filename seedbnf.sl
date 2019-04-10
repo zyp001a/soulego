@@ -139,6 +139,7 @@ inx ->(ast JsonArr, und Objx)Cpt{
 recx ->(str Str)JsonArr{
  #ast = JsonArr(osCmd(osEnvGet("HOME")+"/soulego/parser", str))
  @if(ast.len() == 0){
+  log(str) 
   log(ast)
   die("progl2cpt: wrong grammar")
  }

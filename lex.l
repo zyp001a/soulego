@@ -25,8 +25,8 @@ int check_type();
 {D}+{ID}?		{ count(); yylval = initstr(yytext); return(INT); }
 {D}*"."{D}+{ID}?	{ count(); yylval = initstr(yytext); return(FLOAT); }
 
-{ID}?'(\\.|[^\\'])+'	{ count(); yylval = initstr(yytext); return(STR); }
-{ID}?\"(\\.|[^\\"])*\"	{ count(); yylval = initstr(yytext); return(STR); }
+{ID}?'(\\.|[^\\'])*'	{ count(); yylval = initstr2(yytext, '\''); return(STR); }
+{ID}?\"(\\.|[^\\"])*\"	{ count(); yylval = initstr2(yytext, '"'); return(STR); }
 
 [;,\n\r]  { count(); return(ED); }
 

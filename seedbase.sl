@@ -1,4 +1,4 @@
-T := @enum CLASS CLASSNS CLASSSET\
+T := @enum CLASS CLASSNS CLASSSET CLASSISO\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  FUNC FUNCMEM FUNCCLASSMEM FUNCBLOCK\
  MID MEM DYM\
@@ -65,8 +65,12 @@ classc.class = classc
 classNsc := classNewx("ClassNs", classc);
 classNsc.type = T##CLASSNS
 
+classIsoc := classNewx("ClassIso", classc);
+classIsoc.type = T##CLASSISO
+
 classSetc := classNewx("ClassSet", classc);
 classNsc.type = T##CLASSSET
+
 
 basens := classNsNewx("base");
 nsx(basens, basens)

@@ -24,6 +24,32 @@ Ast* initstr(char *str)
 	p->ln = -1;
 	return p;
 }
+Ast* initstr2(char *str, char q)
+{
+	int i = -1;
+	Ast* p = (Ast*)malloc(sizeof(Ast));
+	memset (p, 0, sizeof(Ast));
+	int len = strlen(str);
+	int start = 0;
+	while(1){
+		i++;
+		if(!start){
+			if(str[i] == q){
+				start = i + 1;
+			}
+		}else{
+			if(str[i] == q){
+				break;
+			}
+		}
+	}
+	int nlen = i-start;
+	p->str = malloc(nlen+1);
+	strncpy(p->str, str+start, nlen);
+	p->str[nlen] = 0;
+	p->ln = -1;
+	return p;
+}
 void print(Ast *ast)
 {
 	int i;

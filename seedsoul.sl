@@ -5,7 +5,7 @@ nsx(soulns, soulns)
 
 soulc := classxNewx("Soul", soulns, undc)//, undc, impc)
 
-mainf := funcNewx("main", soulns, ->(arr ArrCptx)Cpt{
+soulMainf := funcNewx("main", soulns, ->(arr ArrCptx)Cpt{
  #soul = Objx(Classx(arr[0]).obj)
  #osargs = @soul.getCmdArgs()
  @if(osargs.len() == 1){

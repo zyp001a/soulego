@@ -8,6 +8,9 @@ funcBlockc := classxNewx("FuncBlock", execns, funcc);
 funcBlockc.type = T##FUNCBLOCK
 
 
+mainf := funcMemNewx("main", execns, ->(arr ArrCptx, mem Memx)Cpt{
+ @return arr[0]
+}, anyc)
 valf := funcMemNewx("val", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
 }, valc, dymc, [classc])
@@ -15,10 +18,14 @@ paragraphf := funcMemNewx("paragraph", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @each _ e arr{
   #r = execx(e, mem)
   @if(r){
+   
   }
  }
 })
 idf := funcMemNewx("id", execns, ->(arr ArrCptx, mem Memx)Cpt{
+ @return arr[0]
+}, valc, dymc, [classc, strc])
+getf := funcMemNewx("get", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
 }, valc, dymc, [classc, strc])
 callf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
@@ -60,12 +67,13 @@ rexecx ->(class Classx, obj Cpt)Midx{
 
 callBlockx ->(func Classx, args ArrCptx, mem Memx)Cpt{
  #block = Midx(func.obj)
- #classmem = block.args[0]
+ #classmem = Classx(block.args[0])
  #newmem = memNewx(classmem, mem)
  #callarr = ArrMidx(block.args[1])
  @each _ mid callarr{
   #r = execx(mid, newmem)
   @if(r){
+   
   }
  }
 }
@@ -76,5 +84,7 @@ cmgetx ->(cl Classx, key Str)Midx{
   @return midNewx(idf, [r, cl, key]Cpt);
  }
  #r = cgetx(cl.ns, key, {})
- @return midNewx(idf, [r, cl.ns, key]Cpt);
+ @if(r){
+  @return midNewx(idf, [r, cl.ns, key]Cpt);
+ }
 }

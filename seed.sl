@@ -9,5 +9,5 @@ soulSelfo := objxNewx("self", selfns, soulc, {
  mem: memNewx(classMemNewx(selfns))//TODO multi ns
  env: envSelfo
 }Cpt)
-callx(mainf.obj, [soulSelfo]Cpt)
+callx(soulMainf.obj, [soulSelfo]Cpt)
 

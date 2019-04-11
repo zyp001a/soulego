@@ -101,7 +101,7 @@ nsx ->(class Classx, ns Classx){
 
 //NOT NECESSARY
  @if(ns.type == T##CLASSNS){
-  class.path = Str(ns.obj) + "/" + class.name
+  class.path = ns.cpath + "/" + class.name
  }
  
 }
@@ -143,14 +143,14 @@ classNsNewx ->(name Str, prt Classx, alt Classx)Classx{
  #x = classNewx("Ns_"+name, prt, alt);
  x.type = T##CLASSNS
  x.class = classNsc;
- x.obj = name;
+ x.cpath = name;
  @return x;
 }
 classObjNewx ->(name Str, ns Classx, class Classx, prt Classx, alt Classx)Classx{
  #x = classNewx(class.name+"_"+name, prt, alt);
  x.type = T##CLASS
  x.class = class;
- x.obj = name;
+ x.cpath = name;
  nsx(x, ns)
  @return x;
 }
@@ -186,7 +186,7 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
  @if(!cache){
   cache = &Dic
  }
- @if(cl.class.type == T##CLASSNS){
+ @if(cinx(cl.class, classNsc)){
   //DBGET
   @if(dbx["val"]){
    #rr = call(dbx["val"], [cl, key])

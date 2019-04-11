@@ -16,12 +16,23 @@ undc := classxNewx("Und", bnfns);
 
 bnfUndNewx("func", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
- #key = "Func_" + uidx();
  #m = anyc;
  #ret = anyc;  
  #fc = funcBlockc;
  #newcl = classMemNewx(cl.ns, cl);
- #block = undx(ast[2], newcl)
+ 
+ @if(ast.len() >3){
+  #key = Str(undx(ast[2], cl).args[0])
+  #block = undx(ast[3], newcl)
+ }@else{
+  @if(ast[1] != ""){
+   #key = "Func_" + uidx();
+  }@else{
+   #key = Str(ast[1])
+  }
+  #block = undx(ast[2], newcl)  
+ }
+
  #f = funcNewx(key, cl, block, m, ret, _, fc);
  #r = midNewx(valf, [f]Cpt, Str(ast[1]))
  @return r;
@@ -47,19 +58,23 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  die("id not defined "+ast[2])
 })
 
+bnfUndNewx("funcns", ->(arr ArrCptx, clx Classx)Cpt{
+// #ast = JsonArr(arr[0])
+ #key = Str(arr[1])
+ #r = classNsFuncNewx(key, clx.ns)
+ @return midNewx(valf, [r]Cpt)
+})
 bnfUndNewx("get", ->(arr ArrCptx, clx Classx)Cpt{
  #ast = JsonArr(arr[0]) 
  #clmid = undx(ast[2], clx)
  #key = JsonArr(ast[3])[2]
  @if(clmid.func.id == valf.id || clmid.func.id == idf.id){
   #cl = Classx(clmid.args[0])
-  #r = cmgetx(cl, key);
-  @if(!r){
-   log(cl.path)
-   log(cl.cpath)   
-   die("key not get:" + key);
+  #r = cgetx(cl, key);
+  @if(!r){   
+   die("key not get: " + key);
   }
-  @return r;
+  @return midNewx(getf, [r, cl, key]Cpt);
  }
  log(clmid.func.name)
  log(valf.name)
@@ -91,7 +106,7 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
    log(ast[2])  
    die("not function")
   }
-
+ 
   #func = cgetx(nsfunc, c.name, {});//TODO rget
   @if(!func){
    log(nsfunc)
@@ -101,6 +116,10 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
   }
   @return midNewx(callf, [func, args]Cpt)  
  }
+})
+bnfUndNewx("str", ->(arr ArrCptx, cl Classx)Cpt{
+ #ast = JsonArr(arr[0])
+ @return midNewx(valf, [ast[2], strc]Cpt) 
 })
 bnfUndNewx("var", ->(arr ArrCptx, cl Classx)Cpt{
  @return midNewx(valf, [11]Cpt) 
@@ -122,20 +141,20 @@ undNewx ->(ns Classx)Objx{
 }
 
 
-undx ->(ast JsonArr, cl Classx)Midx{
+undx ->(ast JsonArr, cl Classx, key Str)Midx{
  #id = Str(ast[0])
  #f = cgetx(cl.ns, "ClassBnf_base_"+id, {});//TODO other prefix
  @if(!f){
   log(ast)
   die("ast error, not defined "+ id)
  }
- @return callClassMemx(Objx(f.obj).dic["und"], [ast]Cpt, cl)
+ @return callClassMemx(Objx(f.obj).dic["und"], [ast, key]Cpt, cl)
 }
 
-inx ->(ast JsonArr, und Objx)Cpt{
+inx ->(ast JsonArr, und Objx, key Str)Cpt{
  #global = Memx(und.dic["mem"])
  #undglobal = global.class
- #mid = undx(ast, undglobal)
+ #mid = undx(ast, undglobal, key)
  #r = execx(mid, global)
  @return r;
 }

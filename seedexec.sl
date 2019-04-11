@@ -69,3 +69,12 @@ callBlockx ->(func Classx, args ArrCptx, mem Memx)Cpt{
   }
  }
 }
+
+cmgetx ->(cl Classx, key Str)Midx{
+ #r = cgetx(cl, key, {})
+ @if(r){
+  @return midNewx(idf, [r, cl, key]Cpt);
+ }
+ #r = cgetx(cl.ns, key, {})
+ @return midNewx(idf, [r, cl.ns, key]Cpt);
+}

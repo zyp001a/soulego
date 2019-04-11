@@ -40,28 +40,32 @@ bnfUndNewx("paragraph", ->(arr ArrCptx, cl Classx)Cpt{
 bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
  #key = ast[2]
- #r = cgetx(cl, key, {})
+ #r = cmgetx(cl, key)
  @if(r){
-  @return midNewx(idf, [r, cl]Cpt); 
- }
- r = cgetx(cl.ns, key, {}) 
- @if(r){
-  @return midNewx(idf, [r, cl.ns]Cpt); 
+  @return r
  }
  die("id not defined "+ast[2])
 })
 
-bnfUndNewx("get", ->(arr ArrCptx, cl Classx)Cpt{
+bnfUndNewx("get", ->(arr ArrCptx, clx Classx)Cpt{
  #ast = JsonArr(arr[0]) 
- #clmid = undx(ast[2], cl)
- #key = JsonArr(ast[2])[2]
- @if(clmid.func.id == valf.id){
+ #clmid = undx(ast[2], clx)
+ #key = JsonArr(ast[3])[2]
+ @if(clmid.func.id == valf.id || clmid.func.id == idf.id){
   #cl = Classx(clmid.args[0])
-  @return cgetx(cl, key);
+  #r = cmgetx(cl, key);
+  @if(!r){
+   log(cl.path)
+   log(cl.cpath)   
+   die("key not get:" + key);
+  }
+  @return r;
  }
+ log(clmid.func.name)
+ log(valf.name)
+ die("get not defined")
 })
 bnfUndNewx("set", ->(arr ArrCptx, cl Classx)Cpt{
- 
 })
 bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])

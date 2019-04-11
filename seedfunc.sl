@@ -1,7 +1,7 @@
 @load "seedbase"
 Funcx ->(ArrCptx)Cpt
 
-funcns := classNsNewx("func", basens);
+funcns := classNsNewx("func", basens)
 nsx(funcns, funcns)
 
 classNsFuncc := classxNewx("ClassNsFunc", funcns, classNsc);
@@ -14,10 +14,10 @@ classNsFuncNewx ->(key Str, sp Classx)Classx{
  x.class = classNsFuncc;
  nsx(x, sp);
  x.cpath = sp.cpath + "/" + key;
- @return x
+ @return x;
 }
 funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrClassx, fc Classx)Classx{
- //get func class from argtypes and return
+//get func class from argtypes and return
  #x = cgetx(sp, key, {})
  @if(!x){
   #x = classNsFuncNewx(key, sp)
@@ -35,7 +35,7 @@ funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrCl
   return: return
  })
  nsx(y, x)
- y.obj = val;    
+ y.obj = val;
  @return y
 }
 callx ->(func Funcx, args ArrCptx)Cpt{

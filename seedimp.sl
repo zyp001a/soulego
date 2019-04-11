@@ -10,7 +10,7 @@ funcMemNewx("imp", impns, ->(arr ArrCptx, mem Memx)Cpt{
 }, anyc, midc)//Prog class -> mid
 
 impx ->(cla Classx)Midx{
- #r = midNewx(paragraphf)
+ #arr = &ArrCptx;
  log("imp")
- @return r
+ @return midNewx(paragraphf, arr)
 }

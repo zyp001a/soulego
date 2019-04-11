@@ -1,4 +1,4 @@
-T := @enum CLASS CLASSNS CLASSSET CLASSISO\
+T := @enum CLASS CLASSNS CLASSISO CLASSSET\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  FUNC FUNCMEM FUNCCLASSMEM FUNCBLOCK\
  MID MEM DYM\
@@ -47,8 +47,6 @@ Arrx => {
  size: Uint
  id: Uint 
 }
-
-
 
 
 
@@ -221,6 +219,11 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
   }
  }
  @return _;
+}
+nsGetx ->(cl Classx, ns Classx, key Str)Classx{
+
+}
+isoGetx ->(iso Classx, tar Classx)Classx{
 }
 cinx ->(cl Classx, tar Classx)Bool{
  @if(cl.id == tar.id){

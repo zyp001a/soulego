@@ -1,5 +1,8 @@
-@load "seedimp"
+@load "seedagent"
 
-langns := classNsNewx("lang", impns);
+langns := classNsNewx("lang", agentns);
 nsx(langns, langns)
+
+langc := classxNewx("Lang", langns);
+langGoc := objxNewx("go", langns, langc);
 

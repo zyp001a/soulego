@@ -1,9 +1,13 @@
-@load "seedlang"
+@load "seedimp"
 
-envns := classNsNewx("env", langns);
+envns := classNsNewx("env", impns);
 nsx(envns, envns)
 
 envc := classxNewx("Env", envns, agentc)//TODO static mem.heap
+
+logf := funcNewx("log", envns, ->(arr ArrCptx)Cpt{
+ log(arr[0])
+}, anyc)
 
 bearf := funcNewx("bear", envns, ->(arr ArrCptx)Cpt{
  // assign newsoul (new Soul)

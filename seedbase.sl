@@ -32,22 +32,6 @@ Intx := @type Int
 Floatx := @type Float
 Strx := @type Str
 Bytex := @type Byte
-Dicx =>{
- class: Classx
- keys: ArrStrx
- val: DicCptx
- len: Uint
- size: Uint
- id: Uint
-}
-Arrx => {
- class: Classx
- val: ArrCptx
- len: Uint
- size: Uint
- id: Uint 
-}
-
 
 
 
@@ -164,11 +148,11 @@ objNewx ->(class Classx, dic DicCptx)Objx{
  }
 }
 objxNewx ->(name Str, ns Classx, class Classx, dic DicCptx)Classx{
- #x = classNewx(class.name + "_"+name);
- x.type = T##OBJ
+ #x = classNewx(class.name + "_" + name);
+ x.type = T##OBJ;
  x.class = class;
  x.obj = objNewx(class, dic);
- nsx(x, ns)
+ nsx(x, ns);
  @return x;
 }
 classxNewx ->(name Str, ns Classx, prt Classx, alt Classx, dic DicClassx)Classx{
@@ -220,10 +204,8 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
  }
  @return _;
 }
-nsGetx ->(cl Classx, ns Classx, key Str)Classx{
-
-}
 isoGetx ->(iso Classx, tar Classx)Classx{
+ 
 }
 cinx ->(cl Classx, tar Classx)Bool{
  @if(cl.id == tar.id){
@@ -244,4 +226,3 @@ cinx ->(cl Classx, tar Classx)Bool{
  @return @false
  //TODO cache
 }
-

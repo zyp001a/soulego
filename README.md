@@ -1,6 +1,7 @@
 It is not a program, it is a creature.
 
 base + db hook
+struct
 func
 view
 mem
@@ -10,8 +11,8 @@ bnf = bnf + ast + und  (str->mid->cpt)
  db
 prog
 agent
-imp (entity -> ...)
 lang translate TODO
+imp (entity -> ...)
 env
 soul
 

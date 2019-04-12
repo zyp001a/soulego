@@ -4,14 +4,16 @@ impns := classNsNewx("imp", langns);
 nsx(impns, impns)
 
 funcMemNewx("imp", impns, ->(arr ArrCptx, mem Memx)Cpt{
+// #tartype = Classx(arr[0])
  #func = Classx(arr[1])
-// #prog = objNewx(progc)
- arr.push(midNewx(mainf, [func]Cpt))
- #proj = dicNewx(projc)
- dicAddx(proj, "main.go", "1");
+ #lang = Classx(arr[2])
+ #prog = progNewx();
+ #newmem = memNewx(classMemNewx(impns), mem)
+ langx(lang, prog, newmem, midNewx(mainf, [func]Cpt))
+ #proj = progToProjx(prog)
  projWritex(proj, "tmp");
- @return;
-}, anyc, _, [funcc, langc])//imp progshellc TODO
+ @return proj;
+}, anyc, projc, [funcc, classLangc])//imp progshellc TODO
 
 /*
 loadDepx ->(func Classx, arr ArrCptx, dic DicCptx){

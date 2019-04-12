@@ -1,6 +1,6 @@
-@load "seedenv"
+@load "seedimp"
 //self: main rebear 
-soulns := classNsNewx("soul", envns);
+soulns := classNsNewx("soul", impns);
 nsx(soulns, soulns)
 
 soulc := classxNewx("Soul", soulns, undc)//, undc, impc)

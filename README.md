@@ -11,20 +11,21 @@ bnf = bnf + ast + und  (str->mid->cpt)
  db
 prog
 agent
+env
 lang translate TODO
 imp (entity -> ...)
-env
 soul
 
 test? loader?
 
 abc -> func
 abcAbc -> func alt
+abc__Abc -> param func
 
 Abc -> class
 AbcAbc -> parent
 Abc_Abc -> consist
-Abc__Abc_Abc -> param class
+Abc__Abc__Abc -> param class
 
 Abc(_Abc)*_abc* -> instance with name
 Abc__user_abc/1233 -> instance created by user with number/name

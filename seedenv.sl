@@ -1,6 +1,6 @@
-@load "seedimp"
+@load "seedagent"
 
-envns := classNsNewx("env", impns);
+envns := classNsNewx("env", agentns);
 nsx(envns, envns)
 
 envc := classxNewx("Env", envns, agentc)//TODO static mem.heap

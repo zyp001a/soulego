@@ -32,7 +32,7 @@ dicNewx ->(cl Classx)Dicx{
  @return x
 }
 
-dicAddx ->(x Dicx, key Str, val Cpt)Cpt{
+dicSetx ->(x Dicx, key Str, val Cpt)Cpt{
  @if(!x.dic[key]){
   x.arr.push(key)
   x.len ++;

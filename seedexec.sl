@@ -88,3 +88,13 @@ cmgetx ->(cl Classx, key Str)Midx{
   @return midNewx(idf, [r, cl.ns, key]Cpt);
  }
 }
+nscgetx ->(cl Classx, key Str, cl2 Classx)Classx{
+ #r = ccgetx(cl, key, cl2)
+ @if(r){
+  @return r
+ }
+ #r = ccgetx(cl.ns, key, cl2)
+ @if(r){
+  @return r
+ }
+}

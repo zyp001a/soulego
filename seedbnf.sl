@@ -55,15 +55,16 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  @if(r){
   @return r
  }
- die("id not defined "+ast[2])
+ die("id not defined "+key)
 })
-
+/*
 bnfUndNewx("funcns", ->(arr ArrCptx, clx Classx)Cpt{
 // #ast = JsonArr(arr[0])
  #key = Str(arr[1])
  #r = classNsFuncNewx(key, clx.ns)
  @return midNewx(valf, [r]Cpt)
 })
+*/
 bnfUndNewx("get", ->(arr ArrCptx, clx Classx)Cpt{
  #ast = JsonArr(arr[0]) 
  #clmid = undx(ast[2], clx)
@@ -83,6 +84,21 @@ bnfUndNewx("get", ->(arr ArrCptx, clx Classx)Cpt{
 bnfUndNewx("set", ->(arr ArrCptx, cl Classx)Cpt{
 })
 bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
+ log("call "+cl.ns.cpath)
+ #ast = JsonArr(arr[0])
+ #midfunc = undx(ast[2], cl)
+ #args = &ArrCptx
+ @for(#i = 3; i < ast.len(); i++){
+  #e = ast[i]
+  #arg = undx(e, cl)
+  args.push(arg)
+ }
+ @return midNewx(callmidf, [midfunc, args]Cpt)
+})
+  
+
+bnfUndNewx("calln", ->(arr ArrCptx, cl Classx)Cpt{
+ log("calln "+cl.ns.cpath)
  #ast = JsonArr(arr[0])
  #midfunc = undx(ast[2], cl)
  #args = &ArrCptx
@@ -98,24 +114,15 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
   #c = typepredx(args[0]);
  }
 
- @if(midfunc.func != idf){
-  @return midNewx(callmidf, [midfunc, args]Cpt)
- }@else{
-  #nsfunc = Classx(midfunc.args[0])
-  @if(!nsfunc){
-   log(ast[2])  
-   die("not function")
-  }
- 
-  #func = cgetx(nsfunc, c.name, {});//TODO rget
-  @if(!func){
-   log(nsfunc)
-   log(nsfunc.name)   
-   log(c.name)
-   die("func not defined");
-  }
-  @return midNewx(callf, [func, args]Cpt)  
+ #name = Str(midfunc.args[0])
+ #func = nscgetx(cl, name, c);
+ @if(!func){
+  log(cl.ns.cpath) 
+  log(name)
+  log(c.name)  
+  die("func not defined");
  }
+ @return midNewx(callf, [func, args]Cpt)  
 })
 bnfUndNewx("str", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])

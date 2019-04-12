@@ -1,4 +1,4 @@
-T := @enum CLASS CLASSNS CLASSISO CLASSSET\
+T := @enum CLASS CLASSNS CLASSNSSUB CLASSSET\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  FUNC FUNCMEM FUNCCLASSMEM FUNCBLOCK\
  MID MEM DYM\
@@ -44,13 +44,13 @@ classc := &Classx{
  dic: &DicCptx
 }
 classc.class = classc
-classNsc := classNewx("ClassNs", classc);
+classNsc := classNewx("Ns", classc);
 classNsc.type = T##CLASSNS
 
-classIsoc := classNewx("ClassIso", classc);
-classIsoc.type = T##CLASSISO
+classNsSubc := classNewx("NsSub", classNsc);
+classNsSubc.type = T##CLASSNSSUB
 
-classSetc := classNewx("ClassSet", classc);
+classSetc := classNewx("Set", classc);
 classNsc.type = T##CLASSSET
 
 
@@ -130,6 +130,14 @@ classNsNewx ->(name Str, prt Classx, alt Classx)Classx{
  x.cpath = name;
  @return x;
 }
+classNsSubNewx ->(name Str, ns Classx, class Classx, prt Classx, alt Classx)Classx{
+ #x = classNewx(class.name+"_"+name, prt, alt);
+ x.type = T##CLASSNSSUB;
+ x.class = classNsSubc;
+ nsx(x, ns)
+ x.cpath = ns.cpath + "/" + class.name+"_"+name;
+ @return x;
+}
 classObjNewx ->(name Str, ns Classx, class Classx, prt Classx, alt Classx)Classx{
  #x = classNewx(class.name+"_"+name, prt, alt);
  x.type = T##CLASS
@@ -175,6 +183,7 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
   @if(dbx["val"]){
    #rr = call(dbx["val"], [cl, key])
    @if(rr){
+    cl.dic[key] = rr;
     @return rr
    }
   }
@@ -204,8 +213,91 @@ cgetx ->(cl Classx, key Str, cache Dic)Classx{
  }
  @return _;
 }
-isoGetx ->(iso Classx, tar Classx)Classx{
+ccgetx ->(cl Classx, key Str, cl2 Classx, cache Dic)Classx{
+ #r = ccsubgetx(cl, key, cl2);
+ @if(r){
+  @return r
+ }
+ #r = ccsubgetx(cl, key, anyc);
+ @if(r){
+  @return r
+ }
+ @if(!cache){
+  cache = &Dic
+ }  
+ @if(cl.prt){
+  #v = cl.prt;
+  #k = Str(v.id);
+  @if(cache[k] == _){
+   cache[k] = 1;
+   r = ccgetx(v, key, cl2, cache)
+   @if(r != _){
+    @return r;
+   }
+  }
+ }
+ //TODO if prt and alt return different result: die error
+ @if(cl.alt){
+  #v = cl.alt
+  #k = Str(v.id);
+  @if(cache[k] == _){
+   cache[k] = 1;
+   r = ccgetx(v, key, cl2, cache)
+   @if(r != _){
+    @return r;
+   }
+  }
+ }
+ @return _; 
  
+}
+ccsubgetx ->(cl Classx, key Str, cl2 Classx, cache Dic)Classx{
+ @if(cl2.id == anyc.id){
+  #keyx = key
+ }@else{
+  #keyx = key+ "__" + cl2.name; 
+ }
+ #r = cl.dic[keyx];
+ @if(r){
+  @return r
+ }
+ @if(!cache){
+  cache = &Dic
+ }
+ @if(cinx(cl.class, classNsc)){
+  //DBGET
+  @if(dbx["val"]){
+   #rr = call(dbx["val"], [cl, keyx])
+   @if(rr){
+    cl.dic[keyx] = rr;   
+    @return rr
+   }
+  }
+ }
+ @if(cl2.prt){
+  #v = cl2.prt;
+  #k = Str(v.id);
+  @if(cache[k] == _){
+   cache[k] = 1;
+   r = ccsubgetx(cl, key, v, cache)
+   @if(r != _){
+    @return r;
+   }
+  }
+ }
+ //TODO if prt and alt return different result: die error
+ @if(cl2.alt){
+  #v = cl2.alt
+  #k = Str(v.id);
+  @if(cache[k] == _){
+   cache[k] = 1;
+   r = ccsubgetx(cl, key, v, cache)
+   @if(r != _){
+    @return r;
+   }
+  }
+ }
+ @return _;
 }
 cinx ->(cl Classx, tar Classx)Bool{
  @if(cl.id == tar.id){

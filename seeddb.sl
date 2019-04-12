@@ -17,10 +17,12 @@ dbGetx ->(ns Classx, key Str)Str{
   }
   @return jstr;
  }
+ /*
  #d = @fs.stat(fstr) 
  @if(d != _ && d.len()>0){
   @return '["funcns"]';
  }
+ */
 // #f2 = @fs.stat(fstr+".slt") 
 }
 dbx["val"] = ->(ns Classx, key Str)Classx{
@@ -31,7 +33,8 @@ dbx["val"] = ->(ns Classx, key Str)Classx{
    log(jstr)
    die("dbGetx: wrong grammar")
   }
-  @if(cinx(ns.class, classNsFuncc)){
+  
+  @if(cinx(ns.class, classNsSubc)){
    @return inx(ast, undNewx(ns.ns), key);
   }
   @return inx(ast, undNewx(ns), key);   

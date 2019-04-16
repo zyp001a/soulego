@@ -51,7 +51,10 @@ classNsSubc := classNewx("NsSub", classNsc);
 classNsSubc.type = T##CLASSNSSUB
 
 classSetc := classNewx("Set", classc);
-classNsc.type = T##CLASSSET
+classSetc.type = T##CLASSSET
+
+classTuplec := classNewx("Tuple", classc);
+classTuplec.type = T##CLASSTUPLE
 
 
 basens := classNsNewx("base");
@@ -88,6 +91,8 @@ nsx ->(class Classx, ns Classx){
   class.path = ns.cpath + "/" + class.name
  }
  
+}
+classSetNewx ->(x ArrClassx, ){
 }
 classNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
  #x = &Classx{

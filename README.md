@@ -25,6 +25,7 @@ abc__Abc -> param func
 Abc -> class
 AbcAbc -> parent
 Abc_Abc -> consist
+Abc_2 -> tuple
 Abc__Abc__Abc -> param class
 
 Abc(_Abc)*_abc* -> instance with name

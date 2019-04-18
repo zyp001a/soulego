@@ -1,4 +1,27 @@
 It is not a program, it is a creature.
+
+
+
+
+
+
+
+imp func
+
+scope-----
+| describe use mid
+| 
+|
+
+
+
+
+
+
+
+
+
+
 black grey white
 
 base + db hook

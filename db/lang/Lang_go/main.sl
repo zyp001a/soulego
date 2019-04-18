@@ -1,3 +1,3 @@
-func {
- calln "log" "1"
-}
+def FuncBlock (block {
+ call "log" "Lang_go/main"
+})

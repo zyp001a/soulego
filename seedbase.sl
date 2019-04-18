@@ -7,6 +7,7 @@ Cptx := @type Cpt
 ArrCptx := @type Arr Cptx
 DicCptx := @type Dic Cptx
 ArrClassx := @type Arr Classx
+ArrObjx := @type Arr Objx
 DicClassx := @type Dic Classx
 ArrStrx := @type Arr Str
 Classx =>{
@@ -93,7 +94,6 @@ nsx ->(class Classx, ns Classx){
  }
  
 }
-
 classNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
  #x = &Classx{
   type: T##CLASS

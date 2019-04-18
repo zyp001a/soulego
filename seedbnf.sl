@@ -16,35 +16,44 @@ astc := classxNewx("Ast", bnfns, jsonArrc);
 
 undc := classxNewx("Und", bnfns);
 
-bnfUndNewx("func", ->(arr ArrCptx, cl Classx)Cpt{
+bnfUndNewx("block", ->(arr ArrCptx, cl Classx)Cpt{//extra func
  #ast = JsonArr(arr[0])
- #m = anyc;
- #ret = anyc;  
- #fc = funcBlockc;
  #newcl = classMemNewx(cl.ns, cl);
- 
- @if(ast.len() >3){
-  #key = Str(undx(ast[2], cl).args[0])
-  #block = undx(ast[3], newcl)
+ #func = Classx(arr[1])
+ func.obj = undx(ast[2], newcl)
+ @return midNewx(valf, [1]Cpt)//TODO delete
+})
+bnfUndNewx("def", ->(arr ArrCptx, cl Classx)Cpt{//extra key
+ #ast = JsonArr(arr[0])
+ #ckey = Str(arr[2])
+ #prtmid = undx(ast[2], cl);
+ #prt = Classx(prtmid.args[0]);
+ @if(ckey != ""){
+  #key = ckey;
+  #ind = 3
  }@else{
-  @if(ast[1] != ""){
-   #key = "Func_" + uidx();
+  #ckeyast = JsonArr(ast[3])
+  @if(ckeyast[0] == "str"){
+   #key = Str(ckeyast[3])
   }@else{
-   #key = Str(ast[1])
+   #key = prt.name + "_" + uidx();
   }
-  #block = undx(ast[2], newcl)  
+  #ind = 4;
  }
-
- #f = funcNewx(key, cl, block, m, ret, _, fc);
- #r = midNewx(valf, [f]Cpt, Str(ast[1]))
+ #func = classNewx(key, prt); 
+ @for(#i=ind; #i<ast.len(); i++){
+  undx(ast[i], cl, func);
+ } 
+ #r = midNewx(valf, [func]Cpt, Str(ast[1]))
  @return r;
 })
 bnfUndNewx("paragraph", ->(arr ArrCptx, cl Classx)Cpt{
  #ast = JsonArr(arr[0])
+ #func = arr[1];
  #args = &ArrMidx;
  @for(#i = 2; i < ast.len(); i++){
   #e = ast[i]
-  #mid = undx(e, cl)
+  #mid = Midx(undx(e, cl, func))
   args.push(mid);
  }
  #r = midNewx(paragraphf, [cl, args]Cpt, Str(ast[1]))
@@ -59,14 +68,6 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  }
  die("id not defined "+key)
 })
-/*
-bnfUndNewx("funcns", ->(arr ArrCptx, clx Classx)Cpt{
-// #ast = JsonArr(arr[0])
- #key = Str(arr[1])
- #r = classNsFuncNewx(key, clx.ns)
- @return midNewx(valf, [r]Cpt)
-})
-*/
 bnfUndNewx("get", ->(arr ArrCptx, clx Classx)Cpt{
  #ast = JsonArr(arr[0]) 
  #clmid = undx(ast[2], clx)
@@ -85,24 +86,20 @@ bnfUndNewx("get", ->(arr ArrCptx, clx Classx)Cpt{
 })
 bnfUndNewx("set", ->(arr ArrCptx, cl Classx)Cpt{
 })
+bnfUndNewx("exec", ->(arr ArrCptx, cl Classx)Cpt{
+ log("exec "+cl.ns.cpath)
+ #ast = JsonArr(arr[0])
+ #block = undx(ast[2], cl)
+ @return block;
+})
+  
+
 bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  log("call "+cl.ns.cpath)
  #ast = JsonArr(arr[0])
  #midfunc = undx(ast[2], cl)
- #args = &ArrCptx
- @for(#i = 3; i < ast.len(); i++){
-  #e = ast[i]
-  #arg = undx(e, cl)
-  args.push(arg)
- }
- @return midNewx(callmidf, [midfunc, args]Cpt)
-})
-  
-
-bnfUndNewx("calln", ->(arr ArrCptx, cl Classx)Cpt{
- log("calln "+cl.ns.cpath)
- #ast = JsonArr(arr[0])
- #midfunc = undx(ast[2], cl)
+ #name = Str(midfunc.args[0])
+ log(name)
  #args = &ArrCptx
  @for(#i = 3; i < ast.len(); i++){
   #e = ast[i]
@@ -116,7 +113,6 @@ bnfUndNewx("calln", ->(arr ArrCptx, cl Classx)Cpt{
   #c = typepredx(args[0]);
  }
 
- #name = Str(midfunc.args[0])
  #func = nscgetx(cl, name, c);
  @if(!func){
   log(cl.ns.cpath) 
@@ -151,7 +147,7 @@ undNewx ->(ns Classx)Objx{
 }
 
 
-undx ->(ast JsonArr, cl Classx, key Str)Midx{//TODO with bnf obj
+undx ->(ast JsonArr, cl Classx, prt Classx, key Str)Midx{//TODO with bnf obj
  #id = Str(ast[0])
  DicCptx#dic = bnfBaseo.dic
  #f = dic[id];
@@ -159,13 +155,13 @@ undx ->(ast JsonArr, cl Classx, key Str)Midx{//TODO with bnf obj
   log(ast)
   die("ast error, not defined "+ id)
  }
- @return callClassMemx(DicCptx(f)["und"], [ast, key]Cpt, cl)
+ @return callClassMemx(DicCptx(f)["und"], [ast, prt, key]Cpt, cl)
 }
 
 inx ->(ast JsonArr, und Objx, key Str)Cpt{
  #global = Memx(und.dic["mem"])
  #undglobal = global.class
- #mid = undx(ast, undglobal, key)
+ #mid = undx(ast, undglobal, _, key)
  #r = execx(mid, global)
  @return r;
 }

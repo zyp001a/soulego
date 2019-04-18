@@ -33,6 +33,10 @@ Abc(_Abc)*_abc* -> instance with name
 Abc__user_abc/1233 -> instance created by user with number/name
 
 
+
+FuncBlock
+obj: [block, clmem]
+
 Base
 Root
 Cpt

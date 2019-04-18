@@ -7,6 +7,7 @@ nsx(funcns, funcns)
 funcc := classxNewx("Func", funcns);
 funcc.type = T##FUNC
 
+
 funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrClassx, fc Classx)Classx{
 //get func class from argtypes and return
  @if(!m){
@@ -23,9 +24,20 @@ funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrCl
  }@else{
   #keyx = key 
  }
+ #nargtypes = &ArrClassx;
+ @if(argtypes != _){
+  @each i arg argtypes{
+   @if(arg.ns){ //the prop of class is class
+    #narg = classNewx("arg"+i, arg);
+    nargtypes.push(narg)
+   }@else{
+    nargtypes.push(arg)  
+   }
+  }
+ }
  y = classNewx(keyx, fc, _, {
   main: m
-  args: classSetNewx("args", argtypes)
+  args: classSetNewx("args", nargtypes)
   return: return
  })
  nsx(y, sp) 

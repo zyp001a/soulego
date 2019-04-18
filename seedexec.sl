@@ -15,7 +15,8 @@ valf := funcMemNewx("val", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
 }, valc, dymc, [classc])
 paragraphf := funcMemNewx("paragraph", execns, ->(arr ArrCptx, mem Memx)Cpt{
- @each _ e arr{
+ #pr = ArrMidx(arr[1])
+ @each _ e pr{
   #r = execx(e, mem)
   @if(r){
    
@@ -37,16 +38,6 @@ callf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
  }
  @return execx(midNewx(func, argsn), mem)
 }, anyc)//funcc
-callmidf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
- #funcmid = Midx(arr[0])
- #args = ArrCptx(arr[1])
- #argsn = &ArrCptx
- @each _ v args{
-  argsn.push(execx(v, mem))
- }
- #func = Classx(execx(funcmid, mem))
- @return execx(midNewx(func, argsn), mem) 
-}, midc)
 
 execx ->(mid Midx, mem Memx)Cpt{
  @if(mid.func.type == T##FUNC){

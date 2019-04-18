@@ -13,7 +13,7 @@ funcMemNewx("imp", impns, ->(arr ArrCptx, mem Memx)Cpt{
  #proj = progToProjx(prog)
  projWritex(proj, "tmp");
  @return proj;
-}, anyc, projc, [funcc, classLangc])//imp progshellc TODO
+}, anyc, projc)//imp progshellc TODO
 
 /*
 loadDepx ->(func Classx, arr ArrCptx, dic DicCptx){

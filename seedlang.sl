@@ -7,14 +7,15 @@ classLangc := classxNewx("Lang", langns, classNsSubc);
 langGoc := classNsSubNewx("go", langns, classLangc);
 
 langx ->(lang Classx, prog Progx, mem Memx, mid Midx)Str{
- #func = mid.func;
- #f = ccgetx(lang, func.name, func.dic["main"].prt)
+ #funccl = mid.func
+ #func = Funcx(funccl.obj);
+ #f = ccgetx(lang, funccl.name, func.main)
  @if(!f){
   log(lang.name)
   log(lang.cpath)  
-  die(func.name + "__" + func.dic["main"].prt.name + " is not defined")
+  die(funccl.name + "__" + func.main.name + " is not defined")
  }
- execx(midNewx(f, [lang, prog, mid]Cpt), mem)
+ callx(f.obj, [lang, prog, mid]Cpt, mem)
  @return "";
 }
 

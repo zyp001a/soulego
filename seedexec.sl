@@ -5,15 +5,13 @@ nsx(execns, execns)
 
 execc := classxNewx("Exec", execns)//need main mem(stack+ heap)
 funcBlockc := classxNewx("FuncBlock", execns, funcc);
-funcBlockc.type = T##FUNCBLOCK
-
 
 mainf := funcMemNewx("main", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
 }, anyc)
 valf := funcMemNewx("val", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
-}, valc, dymc, [classc])
+}, valc, dymc)
 paragraphf := funcMemNewx("paragraph", execns, ->(arr ArrCptx, mem Memx)Cpt{
  #pr = ArrMidx(arr[1])
  @each _ e pr{
@@ -25,10 +23,10 @@ paragraphf := funcMemNewx("paragraph", execns, ->(arr ArrCptx, mem Memx)Cpt{
 })
 idf := funcMemNewx("id", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
-}, valc, dymc, [classc, strc])
+}, valc, dymc)
 getf := funcMemNewx("get", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @return arr[0]
-}, valc, dymc, [classc, strc])
+}, valc, dymc)
 callf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
  #func = Classx(arr[0])
  #args = ArrCptx(arr[1])
@@ -36,18 +34,19 @@ callf := funcMemNewx("call", execns, ->(arr ArrCptx, mem Memx)Cpt{
  @each _ v args{
   argsn.push(execx(v, mem))
  }
- @return execx(midNewx(func, argsn), mem)
+ @return callx(func.obj, argsn, mem)
 }, anyc)//funcc
-
 execx ->(mid Midx, mem Memx)Cpt{
- @if(mid.func.type == T##FUNC){
-  @return callx(mid.func.obj, mid.args)
- }@elif(mid.func.type == T##FUNCMEM){
-  @return callMemx(mid.func.obj, mid.args, mem) 
- }@elif(mid.func.type == T##FUNCBLOCK){
-  @return callBlockx(mid.func, mid.args, mem);
+ @return callx(mid.func.obj, mid.args, mem)
+}
+callx ->(func Funcx, args ArrCptx, mem Memx)Cpt{
+ @if(cinx(func.class, funcMemc)){
+  @return call(NativeFuncMemx(func.val), [args, mem]Cpt)
+ }@elif(cinx(func.class, funcBlockc)){
+  @return callBlockx(func, [args, mem]Cpt) 
+ }@else{
+  @return call(NativeFuncx(func.val), [args])
  }
- die("unknown func type")
 }
 rexecx ->(class Classx, obj Cpt)Midx{
  @if(cinx(class, objc)){
@@ -56,8 +55,8 @@ rexecx ->(class Classx, obj Cpt)Midx{
  @return midNewx(valf, ["1"]Cpt)
 }
 
-callBlockx ->(func Classx, args ArrCptx, mem Memx)Cpt{
- #block = Midx(func.obj)
+callBlockx ->(func Funcx, args ArrCptx, mem Memx)Cpt{
+ #block = Midx(func.val)
  #classmem = Classx(block.args[0])
  #newmem = memNewx(classmem, mem)
  #callarr = ArrMidx(block.args[1])

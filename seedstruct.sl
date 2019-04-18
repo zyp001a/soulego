@@ -20,7 +20,13 @@ structns := classNsNewx("struct", basens)
 dicc := classxNewx("Dic", structns);
 arrc := classxNewx("Arr", structns);
 
+arrNewx ->(cl Classx){
+ 
+}
 dicNewx ->(cl Classx)Dicx{
+ @if(!cl){
+  cl = dicc
+ }
  #x = &Dicx{
   class: cl
   len: 0

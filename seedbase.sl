@@ -1,6 +1,6 @@
 T := @enum CLASS CLASSNS CLASSNSSUB CLASSSET CLASSTUPLE\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
- FUNC FUNCMEM FUNCCLASSMEM FUNCBLOCK\
+ FUNC\
  MID MEM DYM\
  ARRRAW DICRAW
 Cptx := @type Cpt
@@ -52,10 +52,10 @@ classNsc.type = T##CLASSNS
 classNsSubc := classNewx("NsSub", classNsc);
 classNsSubc.type = T##CLASSNSSUB
 
-classSetc := classNewx("Set", classc);
+classSetc := classNewx("Set", classc);//TODO
 classSetc.type = T##CLASSSET
 
-classTuplec := classNewx("Tuple", classc);
+classTuplec := classNewx("Tuple", classc);//TODO
 classTuplec.type = T##CLASSTUPLE
 
 
@@ -104,12 +104,8 @@ classNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
  @if(dic != _){
   x.dic = dic
   @each k v dic{
-   @if(v.ns){ //the prop of class is class
-    #nv = classNewx(k, v);
-    nsx(nv, x)
-   }@else{
-    nsx(v, x)    
-   }
+   #nv = classNewx(k, v);
+   nsx(nv, x)
   }
  }@else{
   x.dic = &DicClassx

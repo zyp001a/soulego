@@ -1,5 +1,18 @@
 @load "seedstruct"
-Funcx ->(ArrCptx)Cpt
+NativeFuncx ->(ArrCptx)Cpt
+ArrArgx := @type Arr Argx
+Argx =>{
+ name: Str
+ class: Class
+ val: Cpt
+}
+Funcx =>{
+ val: Cpt
+ args: ArrArgx
+ return: Classx
+ main: Classx
+ class: Classx
+}
 
 funcns := classNsNewx("func", structns)
 nsx(funcns, funcns)
@@ -7,43 +20,33 @@ nsx(funcns, funcns)
 funcc := classxNewx("Func", funcns);
 funcc.type = T##FUNC
 
-
-funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrClassx, fc Classx)Classx{
+funcNewx ->(key Str, sp Classx, val Cpt, main Classx, return Classx, args ArrArgx, fc Classx)Classx{
 //get func class from argtypes and return
- @if(!m){
-  m = voidc
+ @if(!main){
+  main = anyc
  }
  @if(!fc){
   fc = funcc;
  }
  @if(!return){
-  return = voidc
+  return = anyc
  }
- @if(m.id != anyc.id){
-  #keyx = key + "__" + m.name
+ @if(!args){
+  args = &ArrArgx;
+ }
+ @if(main.id != anyc.id){
+  #keyx = key + "__" + main.name
  }@else{
-  #keyx = key 
+  #keyx = key
  }
- #nargtypes = &ArrClassx;
- @if(argtypes != _){
-  @each i arg argtypes{
-   @if(arg.ns){ //the prop of class is class
-    #narg = classNewx("arg"+i, arg);
-    nargtypes.push(narg)
-   }@else{
-    nargtypes.push(arg)  
-   }
-  }
- }
- y = classNewx(keyx, fc, _, {
-  main: m
-  args: classSetNewx("args", nargtypes)
-  return: return
- })
+ y = classNewx(keyx, fc) 
  nsx(y, sp) 
- y.obj = val;
+ y.obj = &Funcx{
+  val: val
+  args: args
+  return: return
+  main: main
+  class: y 
+ }
  @return y
-}
-callx ->(func Funcx, args ArrCptx)Cpt{
- @return call(func, [args])
 }

@@ -1,8 +1,7 @@
 @load "seedexec"
-
+NativeFuncClassMemx ->(JsonArr, Classx, Classx, Str)Cpt
 bnfns := classNsNewx("bnf", execns);
 nsx(bnfns, bnfns)
-
 
 
 bnfc := classxNewx("Bnf", bnfns);
@@ -15,52 +14,62 @@ jsonArrc := classxNewx("JsonArr", bnfns, valc);
 astc := classxNewx("Ast", bnfns, jsonArrc);
 
 undc := classxNewx("Und", bnfns);
+funcClassMemc := classxNewx("FuncClassMem", bnfns, funcc);
 
-bnfUndNewx("block", ->(arr ArrCptx, cl Classx)Cpt{//extra func
- #ast = JsonArr(arr[0])
- #newcl = classMemNewx(cl.ns, cl);
- #func = Classx(arr[1])
- func.obj = undx(ast[2], newcl)
+bnfUndNewx("arg", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
+ #argcl = getIdx(ast[2], cl)
+ #key = getStrx(ast[3])//TODO auto key
+ #func = Funcx(belong.obj)
+ func.args.push(&Argx{
+  name: key,
+  class: argcl
+ })
+ #ncl = classNewx(key, argcl)
+ nsx(ncl, cl)
  @return midNewx(valf, [1]Cpt)//TODO delete
 })
-bnfUndNewx("def", ->(arr ArrCptx, cl Classx)Cpt{//extra key
- #ast = JsonArr(arr[0])
- #ckey = Str(arr[2])
- #prtmid = undx(ast[2], cl);
- #prt = Classx(prtmid.args[0]);
- @if(ckey != ""){
-  #key = ckey;
+bnfUndNewx("block", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
+ #func = Funcx(belong.obj)
+ func.val = undx(ast[2], cl)
+ @return midNewx(valf, [1]Cpt)//TODO delete
+})
+bnfUndNewx("def", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
+ #prt = getIdx(ast[2], cl);
+ @if(name != ""){
+  #key = name;
   #ind = 3
  }@else{
-  #ckeyast = JsonArr(ast[3])
-  @if(ckeyast[0] == "str"){
-   #key = Str(ckeyast[3])
-  }@else{
-   #key = prt.name + "_" + uidx();
-  }
+  #key = getStrx(ast[3], prt.name + "_" + uidx());
   #ind = 4;
  }
- #func = classNewx(key, prt); 
- @for(#i=ind; #i<ast.len(); i++){
-  undx(ast[i], cl, func);
- } 
- #r = midNewx(valf, [func]Cpt, Str(ast[1]))
+ #func = classNewx(key, prt);
+ @if(cinx(prt, funcc)){
+  #x = &Funcx{
+   class: prt
+  }
+  x.args = &ArrArgx
+  func.obj = x
+  #newcl = classMemNewx(cl.ns, cl); 
+  @for(#i=ind; #i<ast.len(); i++){
+   undx(ast[i], newcl, func);
+  } 
+  #r = midNewx(valf, [func]Cpt, Str(ast[1]))
+ }@else{
+  die("TODO! def not func")
+ }
  @return r;
 })
-bnfUndNewx("paragraph", ->(arr ArrCptx, cl Classx)Cpt{
- #ast = JsonArr(arr[0])
- #func = arr[1];
+bnfUndNewx("paragraph", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
  #args = &ArrMidx;
  @for(#i = 2; i < ast.len(); i++){
   #e = ast[i]
-  #mid = Midx(undx(e, cl, func))
+  #mid = Midx(undx(e, cl, belong))
   args.push(mid);
  }
  #r = midNewx(paragraphf, [cl, args]Cpt, Str(ast[1]))
  @return r
 })
-bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
- #ast = JsonArr(arr[0])
+bnfUndNewx("id", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
  #key = ast[2]
  #r = cmgetx(cl, key)
  @if(r){
@@ -68,38 +77,30 @@ bnfUndNewx("id", ->(arr ArrCptx, cl Classx)Cpt{
  }
  die("id not defined "+key)
 })
-bnfUndNewx("get", ->(arr ArrCptx, clx Classx)Cpt{
- #ast = JsonArr(arr[0]) 
- #clmid = undx(ast[2], clx)
- #key = JsonArr(ast[3])[2]
+bnfUndNewx("get", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
+ #key = getStrx(ast[3])
+ #clmid = undx(ast[2], cl) 
  @if(clmid.func.id == valf.id || clmid.func.id == idf.id){
-  #cl = Classx(clmid.args[0])
-  #r = cgetx(cl, key);
+  #from = Classx(clmid.args[0])
+  #r = cgetx(from, key);
   @if(!r){   
    die("key not get: " + key);
   }
-  @return midNewx(getf, [r, cl, key]Cpt);
+  @return midNewx(getf, [r, from, key]Cpt);
  }
+ //TODO get from expr/ not static
  log(clmid.func.name)
  log(valf.name)
  die("get not defined")
 })
-bnfUndNewx("set", ->(arr ArrCptx, cl Classx)Cpt{
-})
-bnfUndNewx("exec", ->(arr ArrCptx, cl Classx)Cpt{
- log("exec "+cl.ns.cpath)
- #ast = JsonArr(arr[0])
+bnfUndNewx("exec", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
  #block = undx(ast[2], cl)
  @return block;
 })
-  
-
-bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
- log("call "+cl.ns.cpath)
- #ast = JsonArr(arr[0])
+bnfUndNewx("call", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
  #midfunc = undx(ast[2], cl)
  #name = Str(midfunc.args[0])
- log(name)
+ log("call func: "+name)
  #args = &ArrCptx
  @for(#i = 3; i < ast.len(); i++){
   #e = ast[i]
@@ -122,15 +123,14 @@ bnfUndNewx("call", ->(arr ArrCptx, cl Classx)Cpt{
  }
  @return midNewx(callf, [func, args]Cpt)  
 })
-bnfUndNewx("str", ->(arr ArrCptx, cl Classx)Cpt{
- #ast = JsonArr(arr[0])
+bnfUndNewx("str", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
  @return midNewx(valf, [ast[2], strc]Cpt) 
 })
-bnfUndNewx("var", ->(arr ArrCptx, cl Classx)Cpt{
+bnfUndNewx("var", ->(ast JsonArr, cl Classx, belong Classx, name Str)Cpt{
  @return midNewx(valf, [11]Cpt) 
 })
 
-bnfUndNewx ->(name Str, func FuncClassMemx)Dic{
+bnfUndNewx ->(name Str, func NativeFuncClassMemx)Dic{
  #o = {
   und: func
   //bnf/rec
@@ -145,9 +145,30 @@ undNewx ->(ns Classx)Objx{
   mem: memNewx(classMemNewx(ns))
  }Cpt)
 }
+getIdx ->(ast JsonArr, cl Classx)Classx{
+ @if(ast[0] != "id"){
+  log(ast)
+  die("cannot get id");
+ }
+ #key = ast[2]
+ #r = cmgetx(cl, key)
+ @if(r){
+  @return r.args[0]
+ }
+ die("id not defined "+key)
+}
+getStrx ->(ast JsonArr, str Str)Str{
+ log(ast)
+ @if(ast[0] != "str"){
+  @if(str != ""){
+   @return str
+  }
+  die("cannot get str");
+ }
+ @return ast[2]
+}
 
-
-undx ->(ast JsonArr, cl Classx, prt Classx, key Str)Midx{//TODO with bnf obj
+undx ->(ast JsonArr, cl Classx, belong Classx, key Str)Midx{//TODO with bnf obj
  #id = Str(ast[0])
  DicCptx#dic = bnfBaseo.dic
  #f = dic[id];
@@ -155,7 +176,7 @@ undx ->(ast JsonArr, cl Classx, prt Classx, key Str)Midx{//TODO with bnf obj
   log(ast)
   die("ast error, not defined "+ id)
  }
- @return callClassMemx(DicCptx(f)["und"], [ast, prt, key]Cpt, cl)
+ @return call(NativeFuncClassMemx(DicCptx(f)["und"]), [ast, cl, belong, key]Cpt)
 }
 
 inx ->(ast JsonArr, und Objx, key Str)Cpt{

@@ -5,8 +5,10 @@ nsx(bnfns, bnfns)
 
 
 
-classBnfc := classxNewx("ClassBnf", bnfns, classc);
-bnfBasec := classObjNewx("base", bnfns, classBnfc)
+bnfc := classxNewx("Bnf", bnfns);
+
+bnfBasec := objxNewx("base", bnfns, bnfc)
+bnfBaseo := Objx(bnfBasec.obj)
 
 jsonArrc := classxNewx("JsonArr", bnfns, valc);
 
@@ -132,13 +134,14 @@ bnfUndNewx("var", ->(arr ArrCptx, cl Classx)Cpt{
  @return midNewx(valf, [11]Cpt) 
 })
 
-bnfUndNewx ->(name Str, func FuncClassMemx)Classx{
+bnfUndNewx ->(name Str, func FuncClassMemx)Dic{
  #o = {
   und: func
   //bnf/rec
  }Cpt
- #oc = objxNewx(name, bnfns, bnfBasec, o)
- @return oc
+ DicCptx#dic = bnfBaseo.dic
+ dic[name] = o
+ @return o
 }
 
 undNewx ->(ns Classx)Objx{
@@ -148,14 +151,15 @@ undNewx ->(ns Classx)Objx{
 }
 
 
-undx ->(ast JsonArr, cl Classx, key Str)Midx{
+undx ->(ast JsonArr, cl Classx, key Str)Midx{//TODO with bnf obj
  #id = Str(ast[0])
- #f = cgetx(cl.ns, "ClassBnf_base_"+id, {});//TODO other prefix
+ DicCptx#dic = bnfBaseo.dic
+ #f = dic[id];
  @if(!f){
   log(ast)
   die("ast error, not defined "+ id)
  }
- @return callClassMemx(Objx(f.obj).dic["und"], [ast, key]Cpt, cl)
+ @return callClassMemx(DicCptx(f)["und"], [ast, key]Cpt, cl)
 }
 
 inx ->(ast JsonArr, und Objx, key Str)Cpt{

@@ -25,7 +25,7 @@ funcNewx ->(key Str, sp Classx, val Cpt, m Classx, return Classx, argtypes ArrCl
  }
  y = classNewx(keyx, fc, _, {
   main: m
-  args: 
+  args: classSetNewx("args", argtypes)
   return: return
  })
  nsx(y, sp) 

@@ -1,10 +1,11 @@
-T := @enum CLASS CLASSNS CLASSNSSUB CLASSSET\
+T := @enum CLASS CLASSNS CLASSNSSUB CLASSSET CLASSTUPLE\
  OBJ INT FLOAT NUMBIG STR BYTES ARR DIC TIME\
  FUNC FUNCMEM FUNCCLASSMEM FUNCBLOCK\
  MID MEM DYM\
  ARRRAW DICRAW
-ArrCptx := @type Arr Cpt
-DicCptx := @type Dic Cpt
+Cptx := @type Cpt
+ArrCptx := @type Arr Cptx
+DicCptx := @type Dic Cptx
 ArrClassx := @type Arr Classx
 DicClassx := @type Dic Classx
 ArrStrx := @type Arr Str
@@ -92,8 +93,7 @@ nsx ->(class Classx, ns Classx){
  }
  
 }
-classSetNewx ->(x ArrClassx, ){
-}
+
 classNewx ->(name Str, prt Classx, alt Classx, dic DicClassx)Classx{
  #x = &Classx{
   type: T##CLASS
@@ -143,6 +143,14 @@ classNsSubNewx ->(name Str, ns Classx, class Classx, prt Classx, alt Classx)Clas
  x.cpath = ns.cpath + "/" + class.name+"_"+name;
  @return x;
 }
+classSetNewx ->(name Str, arr ArrClassx, prt Classx, alt Classx)Classx{
+ #x = classNewx("Set_"+name, prt, alt);
+ x.type = T##CLASSSET
+ x.class = classSetc
+ x.obj = arr;
+ @return x;
+}
+/*
 classObjNewx ->(name Str, ns Classx, class Classx, prt Classx, alt Classx)Classx{
  #x = classNewx(class.name+"_"+name, prt, alt);
  x.type = T##CLASS
@@ -151,6 +159,7 @@ classObjNewx ->(name Str, ns Classx, class Classx, prt Classx, alt Classx)Classx
  nsx(x, ns)
  @return x;
 }
+*/
 objNewx ->(class Classx, dic DicCptx)Objx{
  @if(!dic){
   dic = &DicCptx

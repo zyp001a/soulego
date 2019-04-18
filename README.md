@@ -1,4 +1,5 @@
 It is not a program, it is a creature.
+black grey white
 
 base + db hook
 struct

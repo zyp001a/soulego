@@ -135,8 +135,8 @@ bnfUndNewx ->(name Str, func NativeFuncClassMemx)Dic{
   und: func
   //bnf/rec
  }Cpt
- DicCptx#dic = bnfBaseo.dic
- dic[name] = o
+ bnfBaseo.dic[name] = o
+// dic[name] = o
  @return o
 }
 

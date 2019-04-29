@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+go run ../soul2/main.sl.exec/golang/main.go seed.sl golang
+cd seed.sl.exec/golang/ && go build && cp golang ../../soulego
+

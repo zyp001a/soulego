@@ -1,6 +1,7 @@
 It is not a program, it is a creature.
 
-
+imp: TODO!
+emphasis on basic function
 
 
 

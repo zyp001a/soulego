@@ -93,13 +93,11 @@ word
 }
 | STR
 {
-	$$ = init("str", row);
-	add($$, $1);
+	$$ = $1;
 }
 | ID
 {
-	$$ = init("id", row);
-	add($$, $1);
+	$$ = $1;
 }
 | NULLX
 {

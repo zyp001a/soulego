@@ -24,36 +24,45 @@ Ast* initstr(char *str)
 	p->ln = -1;
 	return p;
 }
+char strbuf[MAXBUF];
 Ast* initstr2(char *str, char q)
 {
 	int i = -1;
 	Ast* p = (Ast*)malloc(sizeof(Ast));
 	memset (p, 0, sizeof(Ast));
-	int len = strlen(str);
 	int start = 0;
+	int nlen = 0;	
+	int cur = 0;
 	while(1){
 		i++;
 		if(!start){
 			if(str[i] == q){
-				start = i + 1;
+				start = 1;
 			}
 		}else{
 			if(str[i] == q){
 				break;
+			}			
+			if(str[i] == '\\' && str[i+1] == q){
+				strbuf[cur] = str[i+1];
+				i++;				
+			}else{
+				strbuf[cur] = str[i];
 			}
+			nlen ++;
+			cur ++;
 		}
 	}
-	int nlen = i-start;
 	p->str = malloc(nlen+1);
-	strncpy(p->str, str+start, nlen);
+	strncpy(p->str, strbuf, nlen);
 	p->str[nlen] = 0;
-	p->ln = -1;
+	p->ln = -2;
 	return p;
 }
 void print(Ast *ast)
 {
 	int i;
-	if(ast->ln != -1){//is ast []
+	if(ast->ln >= 0){//is ast []
 		putchar('[');				
   	printf("\"%s\",\"%d\"", ast->str, ast->ln);
 		for(i=0; i<ast->len; i++){
@@ -61,9 +70,19 @@ void print(Ast *ast)
 			print(ast->arr[i]);
 		}
 		putchar(']');
-	}else{
+	}else if(ast->ln == -1){
+		putchar('"');		
+	 	fprintf(stdout, "%s", ast->str);
+		putchar('"');		
+	}else{		
 		putchar('"');
-  	fprintf(stdout, "%s", ast->str);
+		for(i=0; i<strlen(ast->str); i++){
+			if(ast->str[i] == '"'){
+				fprintf(stdout, "\\%c", ast->str[i]);
+			}else{
+				fprintf(stdout, "%c", ast->str[i]);				
+			}
+		}
 		putchar('"');
 	}
 }

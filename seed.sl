@@ -1,7 +1,7 @@
 @load "seedsoul"
 selfns := classNsNewx("self", soulns);
 nsx(selfns, selfns)
-selfns.cpath = "soul1"
+selfns.cpath = "v1"
 
 envSelfo := objxNewx("self", selfns, envc, {
  mem: memNewx(classMemNewx(soulns))//TODO multi ns

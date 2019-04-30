@@ -13,7 +13,10 @@ soulMainf := funcNewx("main", soulns, ->(arr ArrCptx)Cpt{
   @soul.exit(0)
  }@else{ 
   Str#fc = @fs[osargs[1]]
+  Str#ns = osargs[2]
   JsonArr#ast = recx(fc);
+  
   inx(ast, soul);
+  
  }
 }, soulc)

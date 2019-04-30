@@ -14,6 +14,7 @@ void comment2();
 void unput_if();
 int add_ed();
 int check_type();
+void yyerror(YYSTYPE* ret, const char *s);
 %}
 
 %%
@@ -25,8 +26,8 @@ int check_type();
 {D}+{ID}?		{ count(); yylval = initstr(yytext); return(INT); }
 {D}*"."{D}+{ID}?	{ count(); yylval = initstr(yytext); return(FLOAT); }
 
-{ID}?'(\\.|[^\\'])*'	{ count(); yylval = initstr2(yytext, '\''); return(STR); }
-{ID}?\"(\\.|[^\\"])*\"	{ count(); yylval = initstr2(yytext, '"'); return(STR); }
+\"(\\.|[^\\"])*\"	{ count(); if(yyleng > MAXBUF+2) yyerror(NULL, "string is too large"); yylval = initstr2(yytext, '"'); return(STR); }
+\'(\\.|[^\\'])*\'	{ count(); if(yyleng > MAXBUF+2) yyerror(NULL, "string is too large"); yylval = initstr2(yytext, '\''); return(STR); }
 
 [;,\n\r]  { count(); return(ED); }
 
